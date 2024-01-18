@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DockerBuild>false</DockerBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.2.0" />
+    <PackageReference Include="Yarp.ReverseProxy" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DockerBuild)'=='false'" >
+    <ProjectReference Include="..\APIGateway.Domain\APIGateway.Domain.csproj" />
+    <ProjectReference Include="..\..\..\GSWB.Common\src\Common.Application\Common.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DockerBuild)'=='true'" >
+    <ProjectReference Include="../APIGateway.Domain/APIGateway.Domain.csproj" />
+    <PackageReference Include="Common.Application" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>

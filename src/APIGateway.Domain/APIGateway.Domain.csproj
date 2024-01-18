@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DockerBuild>false</DockerBuild>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(DockerBuild)'=='false'" >
+    <ProjectReference Include="..\..\..\GSWB.Common\src\Common.Domain\Common.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DockerBuild)'=='true'" >
+    <PackageReference Include="Common.Domain" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>

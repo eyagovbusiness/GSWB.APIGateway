@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <RuntimeIdentifiers>linux-musl-x64;win-x64</RuntimeIdentifiers>
+    <DockerBuild>false</DockerBuild>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(DockerBuild)'=='false'" >
+    <ProjectReference Include="..\APIGateway.Infrastructure\APIGateway.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\GSWB.Common\src\Common.Presentation\Common.Presentation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DockerBuild)'=='true'" >
+    <ProjectReference Include="../APIGateway.Infrastructure/APIGateway.Infrastructure.csproj" />
+    <PackageReference Include="Common.Presentation" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
