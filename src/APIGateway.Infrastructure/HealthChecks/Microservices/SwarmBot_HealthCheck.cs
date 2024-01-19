@@ -5,10 +5,10 @@ using TGF.CA.Infrastructure.Discovery;
 
 namespace APIGateway.Infrastructure.HealthChecks.Microservices
 {
-    public class Mandril_HealthCheck : ServiceHealthCheckBase
+    public class SwarmBot_HealthCheck : ServiceHealthCheckBase
     {
-        public Mandril_HealthCheck(IHttpClientFactory aHttpClientFactory, IServiceDiscovery aServiceDiscovery)
-            : base(aHttpClientFactory, aServiceDiscovery, aServiceName: ServicesDiscoveryNames.Mandrill)
+        public SwarmBot_HealthCheck(IHttpClientFactory aHttpClientFactory, IServiceDiscovery aServiceDiscovery)
+            : base(aHttpClientFactory, aServiceDiscovery, aServiceName: ServicesDiscoveryNames.SwarmBot)
         {
         }
 

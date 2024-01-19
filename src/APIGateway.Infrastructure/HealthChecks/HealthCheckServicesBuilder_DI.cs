@@ -15,7 +15,7 @@ namespace APIGateway.Infrastructure.HealthChecks
         {
             aWebHostBuilder.Services
                             .AddHealthChecks()
-                            .AddCheck<Mandril_HealthCheck>(nameof(Mandril_HealthCheck));
+                            .AddCheck<SwarmBot_HealthCheck>(nameof(SwarmBot_HealthCheck));
             return aWebHostBuilder;
         }
     }

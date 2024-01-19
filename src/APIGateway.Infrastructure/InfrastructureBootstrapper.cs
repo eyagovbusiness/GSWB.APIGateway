@@ -62,7 +62,7 @@ namespace APIGateway.Infrastructure
         /// </summary>
         private static void ConfigureCommunication(this WebApplicationBuilder aWebApplicationBuilder)
         {
-            aWebApplicationBuilder.Services.AddScoped<IMandrillCommunicationService, MandrillCommunicationService>();
+            aWebApplicationBuilder.Services.AddScoped<ISwarmBotCommunicationService, SwarmBotCommunicationService>();
             aWebApplicationBuilder.Services.AddScoped<IMembersCommunicationService, MembersCommunicationService>();
 
             aWebApplicationBuilder.Services.AddMessageHandlersInAssembly<RoleTokenRevocationHandler>();
