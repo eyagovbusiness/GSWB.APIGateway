@@ -57,22 +57,22 @@ namespace APIGateway.API.Endpoints
         /// <summary>
         /// Creates a member account in database using the "PreAuthCookie" retrieved after /signIn. The response contains the details about the new member created.
         /// </summary>
-        private async Task<IResult> Put_SignUp([FromBody] SignUpDataDTO? aSignUpData, ClaimsPrincipal aClaims, IMembersCommunicationService aMembersCommunicationService, CancellationToken aCancellationToken = default)
-            => await aMembersCommunicationService.SignUpNewMember(aSignUpData, TokenGenerationHelpers.GetDiscordCookieUserInfo(aClaims), aCancellationToken)
+        private async Task<IResult> Put_SignUp([FromBody] SignUpDataDTO? aSignUpData, ClaimsPrincipal aClaims, IMembersCommunicationService aMembersCommunicationService, CancellationToken? aCancellationToken = default)
+            => await aMembersCommunicationService.SignUpNewMember(aSignUpData, TokenGenerationHelpers.GetDiscordCookieUserInfo(aClaims), aCancellationToken.GetValueOrDefault())
             .ToIResult();
 
         /// <summary>
         /// Get a new pair of access token and refresh token using the "PreAuthCookie" retrieved after /signIn.
         /// </summary>
-        private async Task<IResult> Get_TokenPair(ITokenService aTokenService, ClaimsPrincipal aClaims, CancellationToken aCancellationToken = default)
-            => await aTokenService.GetNewTokenPairAsync(aClaims, aCancellationToken)
+        private async Task<IResult> Get_TokenPair(ITokenService aTokenService, ClaimsPrincipal aClaims, CancellationToken? aCancellationToken = default)
+            => await aTokenService.GetNewTokenPairAsync(aClaims, aCancellationToken.GetValueOrDefault())
             .ToIResult();
 
         /// <summary>
         /// Refresh the expired access token. Requires both access token and refresh tokens sent in the request's body.
         /// </summary>
-        private async Task<IResult> Put_AccessTokenRefresh([FromBody] TokenPairDTO aTokenPair, ITokenService aTokenService, CancellationToken aCancellationToken = default)
-            => await aTokenService.GetRefreshedAccessTokenAsync(aTokenPair, aCancellationToken)
+        private async Task<IResult> Put_AccessTokenRefresh([FromBody] TokenPairDTO aTokenPair, ITokenService aTokenService, CancellationToken? aCancellationToken = default)
+            => await aTokenService.GetRefreshedAccessTokenAsync(aTokenPair, aCancellationToken.GetValueOrDefault())
             .ToIResult();
 
         /// <summary>

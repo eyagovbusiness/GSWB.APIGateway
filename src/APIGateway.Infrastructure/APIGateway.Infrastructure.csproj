@@ -19,14 +19,14 @@
   <ItemGroup Condition="'$(DockerBuild)'=='false'">
     <ProjectReference Include="..\APIGateway.Application\APIGateway.Application.csproj" />
     <ProjectReference Include="..\APIGateway.Domain\APIGateway.Domain.csproj" />
-    <ProjectReference Include="..\..\..\TheGoodFramework\src\CleanArchitecture\Infrastructure\Communication\TGF.CA.Infrastructure.Communication.RabbitMQ\TGF.CA.Infrastructure.Communication.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\..\TheGoodFramework\src\CleanArchitecture\Infrastructure\Comm\TGF.CA.Infrastructure.Comm.RabbitMQ\TGF.CA.Infrastructure.Comm.RabbitMQ.csproj" />
     <ProjectReference Include="..\..\..\GSWB.Common\src\Common.Infrastructure\Common.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(DockerBuild)'=='true'">
     <ProjectReference Include="../APIGateway.Application/APIGateway.Application.csproj" />
     <ProjectReference Include="../APIGateway.Domain/APIGateway.Domain.csproj" />
-    <PackageReference Include="TGF.CA.Infrastructure.Communication.RabbitMQ" Version="1.0.0" />
+    <PackageReference Include="TGF.CA.Infrastructure.Comm.RabbitMQ" Version="1.0.0" />
     <PackageReference Include="Common.Infrastructure" Version="1.0.0" />  
   </ItemGroup>
 

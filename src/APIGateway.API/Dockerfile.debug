@@ -1,0 +1,50 @@
+#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER root
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["GSWB.APIGateway/NuGet.config", "GSWB.APIGateway/"]
+COPY ["GSWB.Common/NuGet.config", "GSWB.Common/"]
+COPY ["GSWB.APIGateway/src/APIGateway.API/APIGateway.API.csproj", "GSWB.APIGateway/src/APIGateway.API/"]
+COPY ["GSWB.APIGateway/src/APIGateway.Infrastructure/APIGateway.Infrastructure.csproj", "GSWB.APIGateway/src/APIGateway.Infrastructure/"]
+COPY ["GSWB.APIGateway/src/APIGateway.Application/APIGateway.Application.csproj", "GSWB.APIGateway/src/APIGateway.Application/"]
+COPY ["GSWB.APIGateway/src/APIGateway.Domain/APIGateway.Domain.csproj", "GSWB.APIGateway/src/APIGateway.Domain/"]
+COPY ["GSWB.Common/src/Common.Domain/Common.Domain.csproj", "GSWB.Common/src/Common.Domain/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Domain/TGF.CA.Domain/TGF.CA.Domain.csproj", "TheGoodFramework/src/CleanArchitecture/Domain/TGF.CA.Domain/"]
+COPY ["TheGoodFramework/src/Common/TGF.Common.ROP/TGF.Common.ROP.csproj", "TheGoodFramework/src/Common/TGF.Common.ROP/"]
+COPY ["GSWB.Common/src/Common.Application/Common.Application.csproj", "GSWB.Common/src/Common.Application/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Application/TGF.CA.Application/TGF.CA.Application.csproj", "TheGoodFramework/src/CleanArchitecture/Application/TGF.CA.Application/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Infrastructure/Comm/TGF.CA.Infrastructure.Communication.RabbitMQ/TGF.CA.Infrastructure.Communication.RabbitMQ.csproj", "TheGoodFramework/src/CleanArchitecture/Infrastructure/Comm/TGF.CA.Infrastructure.Communication.RabbitMQ/"]
+COPY ["TheGoodFramework/src/Common/TGF.Common.Serialization/TGF.Common.Serialization.csproj", "TheGoodFramework/src/Common/TGF.Common.Serialization/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Infrastructure/TGF.CA.Infrastructure.Discovery/TGF.CA.Infrastructure.Discovery.csproj", "TheGoodFramework/src/CleanArchitecture/Infrastructure/TGF.CA.Infrastructure.Discovery/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Infrastructure/TGF.CA.Infrastructure/TGF.CA.Infrastructure.csproj", "TheGoodFramework/src/CleanArchitecture/Infrastructure/TGF.CA.Infrastructure/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Infrastructure/Comm/TGF.CA.Infrastructure.Communication/TGF.CA.Infrastructure.Communication.csproj", "TheGoodFramework/src/CleanArchitecture/Infrastructure/Comm/TGF.CA.Infrastructure.Communication/"]
+COPY ["GSWB.Common/src/Common.Infrastructure/Common.Infrastructure.csproj", "GSWB.Common/src/Common.Infrastructure/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Infrastructure/Persistence/DB/TGF.CA.Infrastructure.DB.PostgreSQL/TGF.CA.Infrastructure.DB.PostgreSQL.csproj", "TheGoodFramework/src/CleanArchitecture/Infrastructure/Persistence/DB/TGF.CA.Infrastructure.DB.PostgreSQL/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Infrastructure/Persistence/DB/TGF.CA.Infrastructure.DB/TGF.CA.Infrastructure.DB.csproj", "TheGoodFramework/src/CleanArchitecture/Infrastructure/Persistence/DB/TGF.CA.Infrastructure.DB/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Infrastructure/Security/TGF.CA.Infrastructure.Identity/TGF.CA.Infrastructure.Identity.csproj", "TheGoodFramework/src/CleanArchitecture/Infrastructure/Security/TGF.CA.Infrastructure.Identity/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Infrastructure/Security/TGF.CA.Infrastructure.Secrets/TGF.CA.Infrastructure.Secrets.csproj", "TheGoodFramework/src/CleanArchitecture/Infrastructure/Security/TGF.CA.Infrastructure.Secrets/"]
+COPY ["GSWB.Common/src/Common.Presentation/Common.Presentation.csproj", "GSWB.Common/src/Common.Presentation/"]
+COPY ["TheGoodFramework/src/CleanArchitecture/Presentation/TGF.CA.Presentation/TGF.CA.Presentation.csproj", "TheGoodFramework/src/CleanArchitecture/Presentation/TGF.CA.Presentation/"]
+COPY ["TheGoodFramework/src/Common/TGF.Common.Logging/TGF.Common.Logging.csproj", "TheGoodFramework/src/Common/TGF.Common.Logging/"]
+RUN dotnet restore "./GSWB.APIGateway/src/APIGateway.API/./APIGateway.API.csproj"
+COPY . .
+WORKDIR "/src/GSWB.APIGateway/src/APIGateway.API"
+RUN dotnet build "./APIGateway.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./APIGateway.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+COPY GSWB.APIGateway/Infrastructure/APIGatewayEntrypointOverride.sh ./entrypoint.sh
+COPY Infrastructure/ServiceAwait/wait_for_service.sh ./wait_for_service.sh
+ENTRYPOINT ["sh", "entrypoint.sh"]
