@@ -1,5 +1,5 @@
-ARG BUILD_CONFIGURATION=Release
-FROM registry.guildswarm.org/base-images/common:latest AS base-packages
+ARG BUILD_CONFIGURATION=Release ENVIRONMENT=staging
+FROM registry.guildswarm.org/$ENVIRONMENT/common:latest AS base-packages
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build 
 ARG BUILD_CONFIGURATION
@@ -18,7 +18,7 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION
 RUN dotnet publish "src/APIGateway.API/APIGateway.API.csproj" -c $BUILD_CONFIGURATION --no-build -o /app/publish /p:UseAppHost=true /p:DockerBuild=true -r linux-musl-x64
 
-FROM registry.guildswarm.org/base-images/dotnet-base AS final 
+FROM registry.guildswarm.org/$ENVIRONMENT/dotnet_base AS final 
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY Infrastructure/APIGatewayEntrypointOverride.sh ./entrypoint.sh
