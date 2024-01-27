@@ -6,10 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <RuntimeIdentifiers>linux-musl-x64;win-x64</RuntimeIdentifiers>
     <DockerBuild>false</DockerBuild>
-    <UserSecretsId>1533f4f8-4f93-46c5-9fe2-a64a7c39a42f</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!--FIXING CVE-2019-0980-->
+    <PackageReference Include="System.Private.Uri" Version="4.3.2" />
+  </ItemGroup>
 
   <ItemGroup Condition="'$(DockerBuild)'=='false'">
     <ProjectReference Include="..\APIGateway.Infrastructure\APIGateway.Infrastructure.csproj" />
@@ -19,10 +22,6 @@
   <ItemGroup Condition="'$(DockerBuild)'=='true'">
     <ProjectReference Include="../APIGateway.Infrastructure/APIGateway.Infrastructure.csproj" />
     <PackageReference Include="Common.Presentation" Version="1.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
   </ItemGroup>
 
 </Project>
