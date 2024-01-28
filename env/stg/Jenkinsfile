@@ -5,6 +5,9 @@ pipeline {
     }
     environment {
         REGISTRY='registry.guildswarm.org'
+        ENV="STG"
+        USER=credentials('user_auto')
+        TOKEN=credentials('token_auto')
         ENVIRONMENT='staging'
         REPO='staging'
         IMAGE='api_gateway'
