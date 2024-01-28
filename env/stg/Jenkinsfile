@@ -73,7 +73,20 @@ pipeline {
                         }
                     }
                 }
-            }  
+        stage('Deploy STG') {
+            agent {
+                label 'python-3.11.6'
+            }
+            steps {
+                script {
+                    container('pytainer') {
+                        sh 'export PYTHONUNBUFFERED=1'
+                        sh "python3 sender.py"
+                    }
+                }
+            }
+        }
+    }  
     post {
         always{
             sh 'rm -rf *'
