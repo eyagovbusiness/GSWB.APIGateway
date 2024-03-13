@@ -54,7 +54,6 @@ namespace APIGateway.API
 
             aWebApplication.MapHealthChecksUI(options => options.UIPath = TGFEndpointRoutes.healthUi);
             aWebApplication.UseEndpointDefinitions();
-            aWebApplication.Run();
         }
 
     }
