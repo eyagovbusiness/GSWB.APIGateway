@@ -1,5 +1,7 @@
 ﻿using APIGateway.API.Endpoints;
+using FluentValidation;
 using HealthChecks.UI.Client;
+using APIGateway.API.Validation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using System.Reflection;
 using TGF.CA.Application;
@@ -28,6 +30,7 @@ namespace APIGateway.API
             );
 
             aWebApplicationBuilder.ConfigureFrontendCORS(aWebApplicationBuilder.Configuration);
+            aWebApplicationBuilder.Services.AddValidatorsFromAssemblyContaining<RefreshTokenValidator>();
         }
 
         /// <summary>

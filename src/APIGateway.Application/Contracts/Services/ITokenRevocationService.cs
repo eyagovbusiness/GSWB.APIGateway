@@ -23,6 +23,12 @@ namespace APIGateway.Application
         /// <param name="aDiscordRoleIdList">List of all DiscordRole ID used to revoke the tokens.</param>
         Task OutdateByDiscordRoleListAsync(ulong[] aDiscordRoleIdList, CancellationToken aCancellationToken);
 
+        /// <summary>
+        /// Adds to the black list a given list of access tokens. Requests with a blacklisted token will result in a 401 unauthorized response.
+        /// </summary>
+        /// <param name="aAccessTokenLisrtToBlacklist">List of access tokens to be added to the black list.</param>
+        public void BlacklistAccessTokenList(IEnumerable<string> aAccessTokenLisrtToBlacklist);
+
     }
 
 }

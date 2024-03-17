@@ -16,6 +16,8 @@ namespace APIGateway.Infrastructure.Helpers.Token
 {
     public static class TokenGenerationHelpers
     {
+        public const int RefreshTokenByteLenght = 64;
+        public static int RefreshTokenLength = 4 * ((RefreshTokenByteLenght + 2) / 3);
         internal const string _issuerClaimType = "iss";
         internal const string _audienceClaimType = "aud";
 
@@ -36,7 +38,7 @@ namespace APIGateway.Infrastructure.Helpers.Token
         /// <returns><see cref="string"/> representing the RefreshToken.</returns>
         internal static string GenerateRefreshToken()
         {
-            var lRandomBytes = new byte[64];
+            var lRandomBytes = new byte[RefreshTokenByteLenght];
             using var lRng = RandomNumberGenerator.Create();
             lRng.GetBytes(lRandomBytes);
             return Convert.ToBase64String(lRandomBytes);

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Immutable;
 using TGF.CA.Infrastructure.DB.Repository;
+using TGF.Common.ROP;
 using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
 
@@ -20,7 +21,10 @@ namespace APIGateway.Infrastructure
 
         #region ITokenPairAuthRecordRepository
         public async Task<IHttpResult<TokenPairAuthRecord>> GetByRefreshTokenAsync(string aRefreshToken, CancellationToken aCancellationToken = default)
-            => await TryQueryAsync((aCancellationToken) => _context.TokenPairAuthRecords.FirstAsync(t => t.RefreshToken == aRefreshToken, aCancellationToken), aCancellationToken);
+#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
+            => await TryQueryAsync((aCancellationToken) => _context.TokenPairAuthRecords.FirstOrDefaultAsync(t => t.RefreshToken == aRefreshToken, aCancellationToken), aCancellationToken)
+            .Verify(tokenPairAuthRecord => tokenPairAuthRecord != default, InfrastructureErrors.AuthDatabase.RefreshTokenNotFound);
+#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
 
         public async Task<IHttpResult<TokenPairAuthRecord>> AddAsync(TokenPairAuthRecord aTokenPairAuthRecord, CancellationToken aCancellationToken = default)
             => await base.AddAsync(aTokenPairAuthRecord, aCancellationToken);
@@ -50,6 +54,23 @@ namespace APIGateway.Infrastructure
         , aSaveResultOverride: (int aChangeCount, int aCommandResult)
         => Result.SuccessHttp(aChangeCount));
 
+        public async Task<IHttpResult<Unit>> DeleteByRefreshTokenAsync(string aRefreshToken, CancellationToken aCancellationToken = default)
+        => await TryCommandAsync(() =>
+        {
+            var lTokenRecordToDelete = _context.TokenPairAuthRecords
+                .FirstOrDefault(t => t.RefreshToken == aRefreshToken);
+
+            if (lTokenRecordToDelete != null)
+                _context.TokenPairAuthRecords.Remove(lTokenRecordToDelete!);
+
+            return Unit.Value;
+        }
+        , aCancellationToken
+        , aSaveResultOverride: (int aChangeCount, Unit aCommandResult)
+        => aChangeCount > 0
+            ? Result.SuccessHttp(aCommandResult)
+            : Result.Failure<Unit>(InfrastructureErrors.AuthDatabase.RefreshTokenNotFound));
+
         #endregion
 
         #region Private 
@@ -58,8 +79,8 @@ namespace APIGateway.Infrastructure
         {
             var lTokenListToRevoke = aTokenPairAuthRecordList.ToArray();
 
-            if (!lTokenListToRevoke.Any())
-                return ImmutableArray<string>.Empty;
+            if (lTokenListToRevoke.Length == 0)
+                return [];
             foreach (var lRcord in lTokenListToRevoke)
                 lRcord.IsOutdated = true;
 

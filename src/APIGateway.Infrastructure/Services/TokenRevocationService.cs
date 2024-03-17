@@ -42,7 +42,7 @@ namespace APIGateway.Infrastructure.Services
 
         public async Task OutdateByDiscordUserListAsync(ulong[] aDiscordUserIdList, CancellationToken aCancellationToken)
         {
-            ImmutableArray<string> lListOfRevokedTokens = Array.Empty<string>().ToImmutableArray();
+            ImmutableArray<string> lListOfRevokedTokens = [];
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var lTokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
@@ -54,6 +54,12 @@ namespace APIGateway.Infrastructure.Services
             }
             if (lListOfRevokedTokens.Length > 0)
                 UpdateRevokedTokenBuckets(lListOfRevokedTokens);
+        }
+
+        public void BlacklistAccessTokenList(IEnumerable<string> aAccessTokenLisrtToBlacklist)
+        {
+            if (aAccessTokenLisrtToBlacklist.Any())
+                UpdateRevokedTokenBuckets(aAccessTokenLisrtToBlacklist);
         }
 
         public async Task OutdateByDiscordRoleListAsync(ulong[] aDiscordRoleIdList, CancellationToken aCancellationToken)

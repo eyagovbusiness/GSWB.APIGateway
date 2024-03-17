@@ -2,6 +2,7 @@
 using APIGateway.Domain.Entities;
 using System.Collections.Immutable;
 using System.Security.Claims;
+using TGF.Common.ROP;
 using TGF.Common.ROP.HttpResult;
 
 namespace APIGateway.Application
@@ -40,5 +41,16 @@ namespace APIGateway.Application
         /// <param name="aDiscordRoleIdList">List of DiscordRoleId used to revoke the tokens.</param>
         /// <returns>List of <see cref="string"/> with the revoked access tokens.</returns>
         Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForRoleListAsync(IEnumerable<ulong> aDiscordRoleIdList, CancellationToken aCancellationToken = default);
+
+        /// <summary>
+        /// Cleans the current token pair the user is logged with, so after this operation.
+        /// </summary>
+        /// <param name="aRefreshToken">The refresh token used to select the TokenPair row to be deleted from Auth db.</param>
+        /// <remarks>
+        ///  After this operation if the client want to make new request to endpoints required authentication, then the client will need to ask for a new pair with the PreAuthCookie.
+        ///  If this last one was removed also from the client it will be a complete logout and the useer will need to SignIn with Discord again.
+        /// </remarks>
+        Task<IHttpResult<Unit>> OnSignOutTokenCleanupAsync(string aRefreshToken, CancellationToken aCancellationToken = default);
+
     }
 }

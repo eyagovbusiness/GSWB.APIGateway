@@ -7,20 +7,15 @@ namespace APIGateway.Infrastructure
     {
         public class Identity
         {
-            public static HttpError SignOutFailure => new(
-            new Error("SignOutFailure",
-                "The requested SignOut failed."),
-            HttpStatusCode.BadRequest);
-
-            public static HttpError RefreshTokenFailure => new(
-            new Error("RefreshTokenFailure",
-                "The token refresh failed."),
+            public static HttpError CookieSignOutFailure => new(
+            new Error("Identity.CookieSignOutFailure",
+                "The PreAuthCookie SignOut process failed."),
             HttpStatusCode.InternalServerError);
 
             public class Claims
             {
                 public static HttpError NoApplicationRoleFound => new(
-                new Error("Claims.NoApplicationRoleFound",
+                new Error("Identiy.Claims.NoApplicationRoleFound",
                     "Could not generate claims for this member because no application role was assigned to the member."),
                 HttpStatusCode.BadRequest);
             }
@@ -34,9 +29,14 @@ namespace APIGateway.Infrastructure
                 "Storing the AuthTokens in database failed."),
             HttpStatusCode.InternalServerError);
 
-            public static HttpError AuthTokenNotFound => new(
+            public static HttpError AccessTokenNotFound => new(
             new Error("AuthDatabase.AuthTokenNotFound",
-                "Could not find any match of the AuthToken in the database."),
+                "Could not find any match of the AuthToken in the auth database."),
+            HttpStatusCode.NotFound);
+
+            public static HttpError RefreshTokenNotFound => new(
+            new Error("AuthDatabase.AuthTokenNotFound",
+                "Could not find any TokenPairAuthRecord matching the provided RefreshToken in the auth database."),
             HttpStatusCode.NotFound);
 
             public static HttpError NotAllTokenRevocationSaved => new(
@@ -46,17 +46,22 @@ namespace APIGateway.Infrastructure
 
         }
 
-        public class AuthTokenRefreshRequest
+        public class AuthTokenRefresh
         {
-            public static HttpError Invalid => new(
-            new Error("AuthTokenRefresh.BadTokenRefreshRequest.Invalid",
-                "The token requested to refresh is not valid or not recognized by the authDB."),
-            HttpStatusCode.BadRequest);
+            public class BadTokenRefreshRequest
+            {
 
-            public static HttpError NotExpired => new(
-            new Error("AuthTokenRefresh.BadTokenRefreshRequest.NotExpired",
-                "The token sent in this token refresh request has not expired yet."),
-            HttpStatusCode.BadRequest);
+                public static HttpError InvalidRefreshToken => new(
+                new Error("AuthTokenRefresh.RefreshTokenNotFound",
+                    "The refresh token provided in the token refresh request is not valid or not recognized by the authDB."),
+                HttpStatusCode.InternalServerError);
+
+                public static HttpError NotExpired => new(
+                new Error("AuthTokenRefresh.BadTokenRefreshRequest.NotExpired",
+                    "The token sent in this token refresh request has not expired yet."),
+                HttpStatusCode.BadRequest);
+
+            }
 
             public static HttpError ServerError => new(
             new Error("AuthTokenRefresh.ServerError",
