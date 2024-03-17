@@ -6,7 +6,10 @@ namespace APIGateway.API
     {
         public new class Validation : CommonPresentationErrors.Validation
         {
-            public const string RefreshRokenLenght_Code = "Validation.RefreshRoken.InvalidLenght";
+            public static class RefreshToken
+            {
+                public const string InvalidLenght_Code = "Validation.RefreshRoken.InvalidLenght";
+            }
         }
     }
 }

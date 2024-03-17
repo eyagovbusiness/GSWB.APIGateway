@@ -10,7 +10,7 @@ namespace APIGateway.API.Validation
         {
             RuleFor(x => x.RefreshToken)
                 .NotEmpty()
-                .Length(TokenGenerationHelpers.RefreshTokenLength).WithErrorCode(PresentationErrors.Validation.RefreshRokenLenght_Code);
+                .Length(TokenGenerationHelpers.RefreshTokenLength).WithErrorCode(PresentationErrors.Validation.RefreshToken.InvalidLenght_Code);
         }
     }
 }
