@@ -1,5 +1,6 @@
 ﻿using APIGateway.Domain.Entities;
 using System.Collections.Immutable;
+using TGF.Common.ROP;
 using TGF.Common.ROP.HttpResult;
 
 namespace APIGateway.Application
@@ -57,6 +58,14 @@ namespace APIGateway.Application
         /// <param name="aCancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The number of records deleted or Error.</returns>
         Task<IHttpResult<int>> DeleteExpiredRecordsAsync(CancellationToken aCancellationToken = default);
+
+        /// <summary>
+        /// Deletes a given token pair record by its refresh token.
+        /// </summary>
+        /// <param name="aRefreshToken">The refresh token used to select the TokenPair row to be deleted from db.</param>
+        /// <param name="aCancellationToken">The token to monitor for cancellation requests.</param>
+        /// <returns>ROP Result.</returns>
+        Task<IHttpResult<Unit>> DeleteByRefreshTokenAsync(string aRefreshToken, CancellationToken aCancellationToken = default);
 
     }
 

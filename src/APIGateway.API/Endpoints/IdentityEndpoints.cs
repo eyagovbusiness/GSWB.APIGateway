@@ -1,4 +1,5 @@
-﻿using APIGateway.Application;
+﻿using APIGateway.API.Validation;
+using APIGateway.Application;
 using APIGateway.Application.DTOs;
 using APIGateway.Infrastructure.Helpers.Token;
 using Common.Application.Contracts.ApiRoutes;
@@ -11,6 +12,8 @@ using TGF.CA.Infrastructure.Security.Identity.Authentication;
 using TGF.CA.Presentation;
 using TGF.CA.Presentation.Middleware;
 using TGF.CA.Presentation.MinimalAPI;
+using TGF.Common.ROP.HttpResult;
+using TGF.Common.ROP.Result;
 
 namespace APIGateway.API.Endpoints
 {
@@ -26,7 +29,7 @@ namespace APIGateway.API.Endpoints
         {
             aWebApplication.MapGet(APIGatewayApiRoutes.auth_signIn, Get_SignIn).RequireDiscord().SetResponseMetadata(301);
             aWebApplication.MapPut(APIGatewayApiRoutes.auth_signUp, Put_SignUp).RequireDiscord().SetResponseMetadata<MemberDetailDTO>(200, 400);
-            aWebApplication.MapGet(APIGatewayApiRoutes.auth_signOut, Get_SignOut).RequireDiscord().SetResponseMetadata(200);
+            aWebApplication.MapPut(APIGatewayApiRoutes.auth_signOut, Put_SignOut).RequireDiscord().RequireJWTBearer().SetResponseMetadata(200, 400, 404);
             aWebApplication.MapGet(APIGatewayApiRoutes.auth_token, Get_TokenPair).RequireDiscord().SetResponseMetadata<TokenPairDTO>(200, 404);
             aWebApplication.MapPut(APIGatewayApiRoutes.auth_refreshToken, Put_AccessTokenRefresh).SetResponseMetadata<string>(200, 400, 404);
             aWebApplication.MapGet(TGFEndpointRoutes.auth_OAuthFailed, Get_OAuthFiled).SetResponseMetadata(301);
@@ -78,8 +81,14 @@ namespace APIGateway.API.Endpoints
         /// <summary>
         /// SignOut the current user revoking the HTTP only cookie generated after Discord OAuth.
         /// </summary>
-        private IResult Get_SignOut(HttpContext aHttpContext)
-            => Results.SignOut(authenticationSchemes: new string[] { CookieAuthenticationDefaults.AuthenticationScheme });
+        private async Task<IResult> Put_SignOut([FromBody] TokenPairDTO aTokenPair, HttpContext aHttpContext, RefreshTokenValidator aRefreshTokenValidator, ITokenService aTokenService, ITokenRevocationService aTokenRevocationService, CancellationToken aCancellationToken = default)
+            => await Result.CancellationTokenResult(aCancellationToken)
+            .Validate(aTokenPair, aRefreshTokenValidator)
+            .Map(_ => Results.SignOut(authenticationSchemes: [CookieAuthenticationDefaults.AuthenticationScheme]).ExecuteAsync(aHttpContext))
+            .Verify(signOutResult => signOutResult.IsCompletedSuccessfully, Infrastructure.InfrastructureErrors.Identity.CookieSignOutFailure)
+            .Bind(_ => aTokenService.OnSignOutTokenCleanupAsync(aTokenPair.RefreshToken, aCancellationToken))
+            .Tap(_ => aTokenRevocationService.BlacklistAccessTokenList([aTokenPair.AccessToken]))
+            .ToIResult();
 
         /// <summary>
         /// Callback endpoint when OAuth with Discord fails.Redirects to the frontend.The redirection is protected by CORS policy.

@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TGF.CA.Application;
+using TGF.Common.ROP;
 using TGF.Common.ROP.Errors;
 using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
@@ -68,19 +69,25 @@ namespace APIGateway.Infrastructure.Services
             var lValidationTokenResult = await Result.CancellationTokenResult(aCancellationToken)
                 .Bind(_ => GetValidationTokenResult(aTokenPair.AccessToken, aCancellationToken));
 
-            var lTokenPairAuthDBRecord = await lValidationTokenResult
+            var lTokenPairAuthDBRecordResult = await lValidationTokenResult
                 .Bind(_ => _tokenPairAuthRecordRepository.GetByRefreshTokenAsync(aTokenPair.RefreshToken, aCancellationToken));
 
-            return await CheckValidationTokenResultCanBeRefreshed(lValidationTokenResult.Value, aTokenPair, lTokenPairAuthDBRecord.Value, _securityAlg)
-                .Bind(validationTokenResult => RefreshAndSaveTokenPair(validationTokenResult.ClaimsPrincipal, lTokenPairAuthDBRecord.Value))
-                .Verify(token => token != null && token.Length >= 1, InfrastructureErrors.Identity.RefreshTokenFailure);
+            if (!lTokenPairAuthDBRecordResult.IsSuccess)
+                return Result.Failure<string>(InfrastructureErrors.AuthTokenRefresh.BadTokenRefreshRequest.InvalidRefreshToken);
+
+            return await CheckValidationTokenResultCanBeRefreshed(lValidationTokenResult.Value, aTokenPair, lTokenPairAuthDBRecordResult.Value, _securityAlg)
+                .Bind(validationTokenResult => RefreshAndSaveTokenPair(validationTokenResult.ClaimsPrincipal, lTokenPairAuthDBRecordResult.Value))
+                .Verify(token => token != null && token.Length >= 1, InfrastructureErrors.AuthTokenRefresh.ServerError);
         }
 
-        public async Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForMemberListAsync(IEnumerable<ulong> aDiscordUserIdList, CancellationToken aCancellationToken)
+        public async Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForMemberListAsync(IEnumerable<ulong> aDiscordUserIdList, CancellationToken aCancellationToken = default)
         => await _tokenPairAuthRecordRepository.RevokeByDiscordUserIdListAsync(aDiscordUserIdList, aCancellationToken);
 
         public async Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForRoleListAsync(IEnumerable<ulong> aDiscordRoleIdList, CancellationToken aCancellationToken = default)
         => await _tokenPairAuthRecordRepository.RevokeByDiscordRoleIdListAsync(aDiscordRoleIdList, aCancellationToken);
+
+        public async Task<IHttpResult<Unit>> OnSignOutTokenCleanupAsync(string aRefreshToken, CancellationToken aCancellationToken = default)
+        => await _tokenPairAuthRecordRepository.DeleteByRefreshTokenAsync(aRefreshToken, aCancellationToken);
 
         #endregion
 
@@ -153,7 +160,7 @@ namespace APIGateway.Infrastructure.Services
                     JwtSecurityTokenHandler.ValidateToken(aAccessToken, lTokenValidationParameters, out SecurityToken lValidSecurityToken)
                     , (lValidSecurityToken as JwtSecurityToken)!);
         }))
-        .Verify(validateTokenResultStruct => validateTokenResultStruct.SecurityToken != null, InfrastructureErrors.AuthTokenRefreshRequest.ServerError);
+        .Verify(validateTokenResultStruct => validateTokenResultStruct.SecurityToken != null, InfrastructureErrors.AuthTokenRefresh.ServerError);
 
         #region DataAccess
 

@@ -20,10 +20,10 @@ namespace APIGateway.Infrastructure.Helpers.Token
         /// <param name="aSecurityAlg">The security algorithm used by this service to expedite tokens.</param>
         internal static IHttpResult<ValidationTokenResult> CheckValidationTokenResultCanBeRefreshed(ValidationTokenResult aValidationTokenResult, TokenPairDTO aTokenPair, TokenPairAuthRecord? aTokenPairAuthDBRecord, string aSecurityAlg)
         => (aTokenPairAuthDBRecord != null
-            ? Result.SuccessHttp(aValidationTokenResult) : Result.Failure<ValidationTokenResult>(InfrastructureErrors.AuthDatabase.AuthTokenNotFound))
+            ? Result.SuccessHttp(aValidationTokenResult) : Result.Failure<ValidationTokenResult>(InfrastructureErrors.AuthDatabase.AccessTokenNotFound))
             .Verify(_ => aValidationTokenResult.SecurityToken?.Header.Alg.Equals(aSecurityAlg, StringComparison.InvariantCulture) == true
                             && aTokenPairAuthDBRecord!.AccessToken == aTokenPair.AccessToken
-                        , InfrastructureErrors.AuthDatabase.AuthTokenNotFound)
+                        , InfrastructureErrors.AuthDatabase.AccessTokenNotFound)
             .Bind(_ => CanAccessTokenBeRefreshed(aValidationTokenResult, aTokenPairAuthDBRecord!));
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace APIGateway.Infrastructure.Helpers.Token
                 return Result.SuccessHttp(aValidationTokenResult);
 
             return IsAccessTokenExpired(aValidationTokenResult)
-                 ? Result.SuccessHttp(aValidationTokenResult) : Result.Failure<ValidationTokenResult>(InfrastructureErrors.AuthTokenRefreshRequest.NotExpired);
+                 ? Result.SuccessHttp(aValidationTokenResult) : Result.Failure<ValidationTokenResult>(InfrastructureErrors.AuthTokenRefresh.BadTokenRefreshRequest.NotExpired);
         }
 
         /// <summary>
