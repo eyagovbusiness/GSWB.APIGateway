@@ -12,7 +12,7 @@ source wait_for_service.sh
 # Execute tasks before the base entrypoint starts
 execute_before_start() {
     echo "Executing scheduled tasks before the base entrypoint starts.."	
-	wait_IsReady vault #vault waits consul is ready :)
+	wait_IsReady gswb.vault #vault waits consul is ready :)
 	echo "Scheduled tasks before the base entrypoint starts..DONE."
 }
 
