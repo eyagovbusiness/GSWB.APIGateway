@@ -1,7 +1,7 @@
 ﻿using APIGateway.Application;
-using Common.Application.Contracts.ApiRoutes;
 using Common.Application.DTOs;
 using Common.Infrastructure;
+using Common.Infrastructure.Communication.ApiRoutes;
 using TGF.CA.Infrastructure.Communication.Http;
 using TGF.CA.Infrastructure.Discovery;
 using TGF.Common.ROP.HttpResult;

@@ -5,6 +5,7 @@ using APIGateway.Infrastructure.HealthChecks;
 using APIGateway.Infrastructure.Middleware;
 using APIGateway.Infrastructure.Services;
 using Common.Application;
+using Common.Application.Contracts.Services;
 using Common.Infrastructure;
 using Common.Infrastructure.Communication.HTTP;
 using Microsoft.AspNetCore.Builder;

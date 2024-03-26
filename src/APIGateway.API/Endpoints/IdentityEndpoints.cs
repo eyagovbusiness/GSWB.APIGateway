@@ -2,8 +2,8 @@
 using APIGateway.Application;
 using APIGateway.Application.DTOs;
 using APIGateway.Infrastructure.Helpers.Token;
-using Common.Application.Contracts.ApiRoutes;
 using Common.Application.DTOs;
+using Common.Infrastructure.Communication.ApiRoutes;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
