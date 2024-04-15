@@ -1,4 +1,5 @@
-﻿using Common.Application.DTOs;
+﻿using Common.Application.DTOs.Auth;
+using Common.Application.DTOs.Members;
 using TGF.Common.ROP.HttpResult;
 
 namespace APIGateway.Application

@@ -1,5 +1,6 @@
 ﻿using APIGateway.Application;
-using Common.Application.DTOs;
+using Common.Application.DTOs.Auth;
+using Common.Application.DTOs.Members;
 using Common.Infrastructure;
 using Common.Infrastructure.Communication.ApiRoutes;
 using TGF.CA.Infrastructure.Communication.Http;

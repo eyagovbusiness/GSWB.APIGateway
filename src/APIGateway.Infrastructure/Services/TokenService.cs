@@ -2,7 +2,7 @@
 using APIGateway.Application.DTOs;
 using APIGateway.Application.Mapping;
 using APIGateway.Domain.Entities;
-using Common.Application.DTOs;
+using Common.Application.DTOs.Auth;
 using Common.Infrastructure.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
