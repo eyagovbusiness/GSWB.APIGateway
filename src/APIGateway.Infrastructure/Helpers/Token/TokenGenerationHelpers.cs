@@ -1,5 +1,6 @@
 ﻿using APIGateway.Application;
 using APIGateway.Domain.Entities;
+using Common.Application.Contracts.Services;
 using Common.Application.DTOs.Auth;
 using Common.Application.DTOs.Members;
 using Common.Application.DTOs.ProcessingHelpers;

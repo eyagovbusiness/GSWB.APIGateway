@@ -1,5 +1,4 @@
 ﻿using APIGateway.Application;
-using APIGateway.Infrastructure.Communication.HTTP;
 using APIGateway.Infrastructure.Communication.MessageConsumer;
 using APIGateway.Infrastructure.HealthChecks;
 using APIGateway.Infrastructure.Middleware;

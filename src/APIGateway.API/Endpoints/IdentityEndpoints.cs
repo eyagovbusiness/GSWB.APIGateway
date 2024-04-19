@@ -2,6 +2,7 @@
 using APIGateway.Application;
 using APIGateway.Application.DTOs;
 using APIGateway.Infrastructure.Helpers.Token;
+using Common.Application.Contracts.Services;
 using Common.Application.DTOs.Auth;
 using Common.Application.DTOs.Members;
 using Common.Infrastructure.Communication.ApiRoutes;
