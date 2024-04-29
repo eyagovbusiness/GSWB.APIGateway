@@ -33,7 +33,7 @@ namespace APIGateway.API.Endpoints
             aWebApplication.MapPut(APIGatewayApiRoutes.auth_signUp, Put_SignUp).RequireDiscord().SetResponseMetadata<MemberDetailDTO>(200, 400);
             aWebApplication.MapPut(APIGatewayApiRoutes.auth_signOut, Put_SignOut).RequireDiscord().RequireJWTBearer().SetResponseMetadata(200, 400, 404);
             aWebApplication.MapGet(APIGatewayApiRoutes.auth_token, Get_TokenPair).RequireDiscord().SetResponseMetadata<TokenPairDTO>(200, 404);
-            aWebApplication.MapPut(APIGatewayApiRoutes.auth_refreshToken, Put_AccessTokenRefresh).SetResponseMetadata<string>(200, 400, 404);
+            aWebApplication.MapPut(APIGatewayApiRoutes.auth_token_refresh, Put_AccessTokenRefresh).SetResponseMetadata<string>(200, 400, 404);
             aWebApplication.MapGet(TGFEndpointRoutes.auth_OAuthFailed, Get_OAuthFiled).SetResponseMetadata(301);
         }
 
