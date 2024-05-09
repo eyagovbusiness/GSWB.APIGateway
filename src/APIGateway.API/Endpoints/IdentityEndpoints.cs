@@ -8,6 +8,7 @@ using Common.Application.DTOs.Members;
 using Common.Infrastructure.Communication.ApiRoutes;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TGF.CA.Application;
 using TGF.CA.Infrastructure.Security.Identity.Authentication;
@@ -29,11 +30,12 @@ namespace APIGateway.API.Endpoints
         /// <inheritdoc/>
         public void DefineEndpoints(WebApplication aWebApplication)
         {
-            aWebApplication.MapGet(APIGatewayApiRoutes.auth_signIn, Get_SignIn).RequireDiscord().SetResponseMetadata(301);
-            aWebApplication.MapPut(APIGatewayApiRoutes.auth_signUp, Put_SignUp).RequireDiscord().SetResponseMetadata<MemberDetailDTO>(200, 400);
-            aWebApplication.MapPut(APIGatewayApiRoutes.auth_signOut, Put_SignOut).RequireDiscord().RequireJWTBearer().SetResponseMetadata(200, 400, 404);
-            aWebApplication.MapGet(APIGatewayApiRoutes.auth_token, Get_TokenPair).RequireDiscord().SetResponseMetadata<TokenPairDTO>(200, 404);
-            aWebApplication.MapPut(APIGatewayApiRoutes.auth_token_refresh, Put_AccessTokenRefresh).SetResponseMetadata<string>(200, 400, 404);
+            aWebApplication.MapGet(APIGatewayApiRoutes.Auth_signIn.Route, Get_SignIn).RequireDiscord().SetResponseMetadata(301);
+            aWebApplication.MapGet(APIGatewayApiRoutes.Auth_testerSignIn.Route, Get_TesterSignIn).RequireDiscord().SetResponseMetadata(301);
+            aWebApplication.MapPut(APIGatewayApiRoutes.Auth_signUp.Route, Put_SignUp).RequireDiscord().SetResponseMetadata<MemberDetailDTO>(200, 400);
+            aWebApplication.MapPut(APIGatewayApiRoutes.Auth_signOut.Route, Put_SignOut).RequireDiscord().RequireJWTBearer().SetResponseMetadata(200, 400, 404);
+            aWebApplication.MapGet(APIGatewayApiRoutes.Auth_token.Route, Get_TokenPair).RequireDiscord().SetResponseMetadata<TokenPairDTO>(200, 404);
+            aWebApplication.MapPut(APIGatewayApiRoutes.Auth_token_refresh.Route, Put_AccessTokenRefresh).SetResponseMetadata<string>(200, 400, 404);
             aWebApplication.MapGet(TGFEndpointRoutes.auth_OAuthFailed, Get_OAuthFiled).SetResponseMetadata(301);
         }
 
@@ -51,12 +53,25 @@ namespace APIGateway.API.Endpoints
         /// Triggers Discord OAuth in the backend resulting on success in a redirect response where an HTTP only server side cookie "PreAuthCookie" will be attached including information about the authenticated discord user.The redirection is protected by CORS policy.
         /// </summary>
         private IResult Get_SignIn(HttpContext aHttpContext, IConfiguration aConfiguration)
-        {
-            aHttpContext.Response.Headers.Append("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-            aHttpContext.Response.Headers.Append("Pragma", "no-cache");
-            aHttpContext.Response.Headers.Append("Expires", "0");
+            => FinishSignIn(aHttpContext, aConfiguration);
 
-            return Results.Redirect(aConfiguration.GetValue<string>("FrontendURL") + aConfiguration.GetValue<string>("AuthCallbackURI"), permanent: true);
+
+        /// <summary>
+        /// Triggers Discord OAuth in the backend resulting on success in the allow me logic execution and finally a redirect response where an HTTP only server side cookie "PreAuthCookie" will be attached including information about the authenticated discord user.The redirection is protected by CORS policy.
+        /// </summary>
+        private async Task<IResult> Get_TesterSignIn(HttpContext aHttpContext, IAllowMeCommunicationService aAllowMeCommunicationService, ISwarmBotCommunicationService aSwarmBotCommunicationService, IConfiguration aConfiguration)
+        {
+            IResult lResult = default!;
+            try
+            {
+                _ = await aSwarmBotCommunicationService.GetIsTester(aHttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value)
+                    .Bind(testerId => aAllowMeCommunicationService.AllowUser(testerId));
+            }
+            finally //always redirect to frontend
+            {
+                lResult = FinishSignIn(aHttpContext, aConfiguration);
+            }
+            return lResult;
         }
 
         /// <summary>
@@ -104,6 +119,18 @@ namespace APIGateway.API.Endpoints
             return Results.Redirect(aConfiguration.GetValue<string>("FrontendURL") + aConfiguration.GetValue<string>("AuthCallbackFailedURI"), permanent: true);
         }
 
+        #endregion
+
+        #region Helpers
+        private IResult FinishSignIn(HttpContext aHttpContext, IConfiguration aConfiguration)
+        {
+            aHttpContext.Response.Headers.Append("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+            aHttpContext.Response.Headers.Append("Pragma", "no-cache");
+            aHttpContext.Response.Headers.Append("Expires", "0");
+
+            return Results.Redirect(aConfiguration.GetValue<string>("FrontendURL") + aConfiguration.GetValue<string>("AuthCallbackURI"), permanent: true);
+
+        }
         #endregion
 
     }

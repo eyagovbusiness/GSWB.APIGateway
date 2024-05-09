@@ -63,6 +63,7 @@ namespace APIGateway.Infrastructure
         {
             aWebApplicationBuilder.Services.AddScoped<ISwarmBotCommunicationService, SwarmBotCommunicationService>();
             aWebApplicationBuilder.Services.AddScoped<IMembersCommunicationService, MembersCommunicationService>();
+            aWebApplicationBuilder.Services.AddScoped<IAllowMeCommunicationService, AllowMeCommunicationService>();
 
             aWebApplicationBuilder.Services.AddMessageHandlersInAssembly<RoleTokenRevocationHandler>();
             aWebApplicationBuilder.Services.AddServiceBusIntegrationConsumer();
