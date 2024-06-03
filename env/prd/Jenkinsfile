@@ -5,7 +5,7 @@ pipeline {
     }
     environment {
         REGISTRY='registry.guildswarm.org'
-        ENVIRONMENT='production'
+        ENVIRONMENT='staging'
         REPO='production'
         IMAGE='api_gateway'
     }
