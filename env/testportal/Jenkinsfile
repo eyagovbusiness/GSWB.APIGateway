@@ -7,6 +7,7 @@ pipeline {
         REGISTRY='registry.guildswarm.org'
         USER=credentials('user_auto')
         TOKEN=credentials('token_auto')
+        TOOL_LABEL="apigateway"
         ENVIRONMENT='testportal'
         REPO='testportal'
         IMAGE='api_gateway'
@@ -75,15 +76,18 @@ pipeline {
                         }
                     }
                 }
-        stage('Deploy STG') {
-            agent {
-                label 'python-3.11.6'
-            }
+        stage('Delete Pods') {
             steps {
                 script {
-                    container('pytainer') {
-                        sh 'export PYTHONUNBUFFERED=1'
-                        sh "python3 sender.py"
+                    node ('kubectl-1.28'){
+                        container ('kube'){
+                            sh 'mkdir -p ~/.kube/'
+                            withCredentials([file(credentialsId: 'backend-testportal', variable: 'KUBECONFIG_FILE')]) {
+                            // Move the credentials to a temporary location
+                            sh "mv ${KUBECONFIG_FILE} ~/.kube/config"
+                            }
+                            sh "cd /home/guildswarm/ && ./kubectl delete pods -l app=${TOOL_LABEL}"
+                        }
                     }
                 }
             }
