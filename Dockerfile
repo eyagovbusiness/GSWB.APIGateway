@@ -1,4 +1,4 @@
-ARG BUILD_CONFIGURATION=Release ENVIRONMENT=staging
+ARG BUILD_CONFIGURATION=Release ENVIRONMENT=testportal
 FROM registry.guildswarm.org/$ENVIRONMENT/common:latest AS base-packages
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build 
