@@ -2,6 +2,7 @@
 using APIGateway.Infrastructure.Communication.MessageConsumer;
 using APIGateway.Infrastructure.HealthChecks;
 using APIGateway.Infrastructure.Middleware;
+using APIGateway.Infrastructure.Repositories;
 using APIGateway.Infrastructure.Services;
 using Common.Application.Contracts.Services;
 using Common.Infrastructure;
@@ -9,6 +10,7 @@ using Common.Infrastructure.Communication.HTTP;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.RateLimiting;
+using TGF.CA.Application;
 using TGF.CA.Infrastructure;
 using TGF.CA.Infrastructure.Communication.RabbitMQ;
 using TGF.CA.Infrastructure.DB.PostgreSQL;
@@ -32,8 +34,12 @@ namespace APIGateway.Infrastructure
 
             await aWebApplicationBuilder.ConfigureCommonInfrastructureAsync();
 
-            await aWebApplicationBuilder.Services.AddPostgreSQL<APIGatewayAuthDbContext>("ApiGatewayAuthDb");
+            aWebApplicationBuilder.Services.AddScoped<IEncryptionService, EncryptionService>();
+
+            await aWebApplicationBuilder.Services.AddPostgreSQL<AuthDbContext>("AuthDb");
+            await aWebApplicationBuilder.Services.AddPostgreSQL<LegalDbContext>("LegalDb");
             aWebApplicationBuilder.Services.AddScoped<ITokenPairAuthRecordRepository, TokenPairAuthRecordRepository>();
+            aWebApplicationBuilder.Services.AddScoped<IConsentLogRepository, ConsentLogRepository>();
             aWebApplicationBuilder.Services.AddScoped<ITokenService, TokenService>();
             aWebApplicationBuilder.Services.AddSingleton<ITokenRevocationService, TokenRevocationService>();
 
@@ -78,7 +84,8 @@ namespace APIGateway.Infrastructure
         {
             aWebApplication.UseMiddleware<BlockPrivateProxyingMiddleware>();
             aWebApplication.UseCommonInfrastructure();
-            await aWebApplication.UseMigrations<APIGatewayAuthDbContext>();
+            await aWebApplication.UseMigrations<AuthDbContext>();
+            await aWebApplication.UseMigrations<LegalDbContext>();
             aWebApplication.UseMiddleware<TokenFilterMiddleware>();
             aWebApplication.MapReverseProxy();
 

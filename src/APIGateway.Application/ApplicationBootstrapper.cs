@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using APIGateway.Application.Contracts.Services;
+using APIGateway.Application.UseCases;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace APIGateway.Application
 {
@@ -6,7 +8,7 @@ namespace APIGateway.Application
     {
         public static void RegisterApplicationServices(this IServiceCollection aServiceList)
         {
-
+            aServiceList.AddScoped<IConsentLegalService, ConsentLegalService>();
         }
     }
 }

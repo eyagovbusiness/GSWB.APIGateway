@@ -3,10 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APIGateway.Infrastructure
 {
-    public class APIGatewayAuthDbContext : DbContext
+    public class AuthDbContext(DbContextOptions<AuthDbContext> aOptions) : DbContext(aOptions)
     {
-        public APIGatewayAuthDbContext(DbContextOptions<APIGatewayAuthDbContext> options) : base(options) { }
-
         public DbSet<TokenPairAuthRecord> TokenPairAuthRecords { get; set; }
     }
 }

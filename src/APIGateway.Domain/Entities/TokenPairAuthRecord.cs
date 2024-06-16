@@ -1,16 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using TGF.CA.Domain.Primitives;
 
 namespace APIGateway.Domain.Entities
 {
     /// <summary>
     /// Represents a database record to persist access-refresh auth token pairs and support token revocation.
     /// </summary>
-    public class TokenPairAuthRecord
+    public class TokenPairAuthRecord : Entity<Guid>
     {
-        /// <summary>
-        /// Global unique id.
-        /// </summary>
-        public Guid Id { get; set; }
+
         /// <summary>
         /// The authenticated discord user's id which generated this token pair.
         /// </summary>

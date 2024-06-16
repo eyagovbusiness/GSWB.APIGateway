@@ -107,7 +107,7 @@ namespace APIGateway.Infrastructure.Services
                 .Map(key => new SecurityTokenDescriptor()
                 {
                     Subject = new ClaimsIdentity(aClaimList),
-                    Expires = DateTime.UtcNow.Add(_accessTokenLifetime),
+                    Expires = DateTimeOffset.Now.UtcDateTime.Add(_accessTokenLifetime),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), _securityAlg)
                 })
                 .Map(tokenDescriptor => lTokenHandler.CreateToken(tokenDescriptor))
@@ -178,7 +178,7 @@ namespace APIGateway.Infrastructure.Services
             IsOutdated = false,
             DiscordUserId = aDiscordUserId,
             DiscordRoleId = aDiscordRoleId,
-            ExpiryDate = DateTime.UtcNow.Add(_refreshTokenLifetime)
+            ExpiryDate = DateTimeOffset.Now.Add(_refreshTokenLifetime)
         })
         .Bind(newTokenPairAuthRecord => _tokenPairAuthRecordRepository.AddAsync(newTokenPairAuthRecord, aCancellationToken));
 

@@ -3,24 +3,21 @@ using System;
 using APIGateway.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace APIGateway.Infrastructure.Migrations
+namespace APIGateway.Infrastructure.Migrations.AuthDb
 {
-    [DbContext(typeof(APIGatewayAuthDbContext))]
-    [Migration("20231005160904_TokenPairDiscordRole")]
-    partial class TokenPairDiscordRole
+    [DbContext(typeof(AuthDbContext))]
+    partial class AuthDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -45,7 +42,7 @@ namespace APIGateway.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("ExpiryDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsRevoked")
+                    b.Property<bool>("IsOutdated")
                         .HasColumnType("boolean");
 
                     b.Property<string>("RefreshToken")

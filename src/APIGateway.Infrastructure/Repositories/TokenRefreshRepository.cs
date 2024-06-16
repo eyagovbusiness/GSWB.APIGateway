@@ -12,12 +12,12 @@ namespace APIGateway.Infrastructure
 {
 
     /// <summary>
-    /// Implementation of <see cref="ITokenPairAuthRecordRepository"/> that operates over the <see cref="APIGatewayAuthDbContext"/> database context.
+    /// Implementation of <see cref="ITokenPairAuthRecordRepository"/> that operates over the <see cref="AuthDbContext"/> database context.
     /// </summary>
-    internal class TokenPairAuthRecordRepository : RepositoryBase<TokenPairAuthRecordRepository, APIGatewayAuthDbContext>, ITokenPairAuthRecordRepository
+    internal class TokenPairAuthRecordRepository
+        (AuthDbContext aContext, ILogger<TokenPairAuthRecordRepository> aLogger) 
+        : RepositoryBase<TokenPairAuthRecordRepository, AuthDbContext>(aContext, aLogger), ITokenPairAuthRecordRepository
     {
-        public TokenPairAuthRecordRepository(APIGatewayAuthDbContext aContext, ILogger<TokenPairAuthRecordRepository> aLogger)
-        : base(aContext, aLogger) { }
 
         #region ITokenPairAuthRecordRepository
         public async Task<IHttpResult<TokenPairAuthRecord>> GetByRefreshTokenAsync(string aRefreshToken, CancellationToken aCancellationToken = default)
@@ -46,7 +46,7 @@ namespace APIGateway.Infrastructure
         => await TryCommandAsync(() =>
         {
             var expiredRecords = _context.TokenPairAuthRecords
-                .Where(t => t.ExpiryDate < DateTime.UtcNow);
+                .Where(t => t.ExpiryDate < DateTimeOffset.Now);
             _context.TokenPairAuthRecords.RemoveRange(expiredRecords);
             return 0;
         }

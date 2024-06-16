@@ -44,19 +44,18 @@ namespace APIGateway.Infrastructure.Helpers.Token
         /// <summary>
         /// Verifies that the reconstructed access token has expired already by its Claims.
         /// </summary>
-        /// <param name="aPrincipal">The Claims associated to the AccessToken requested to be refreshed.One of them should be the ExpiryDate.</param>
         /// <returns>True if it has expired already, false in case it has not expired yet.</returns>
         private static bool IsAccessTokenExpired(ValidationTokenResult aValidationTokenResult)
         {
             var lExpiration = aValidationTokenResult.ClaimsPrincipal.Claims.First(c => c.Type == JwtRegisteredClaimNames.Exp).Value;
             var lExpirationDate = UnixTimeStampToDateTime(double.Parse(lExpiration));
-            return lExpirationDate <= DateTime.UtcNow;
+            return lExpirationDate <= DateTimeOffset.Now;
         }
 
         private static DateTimeOffset UnixTimeStampToDateTime(double aUnixTimeStamp)
         {
-            var lDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            return lDateTime.AddSeconds(aUnixTimeStamp).ToUniversalTime();
+            var lDateTime = new DateTimeOffset(1970, 1, 1, 0, 0, 0, 0, 0, TimeSpan.FromHours(0));
+            return lDateTime.AddSeconds(aUnixTimeStamp);
         }
 
         internal readonly struct ValidationTokenResult

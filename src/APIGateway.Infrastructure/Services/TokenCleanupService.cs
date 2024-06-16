@@ -36,7 +36,7 @@ namespace APIGateway.Infrastructure.Services
         {
             _logger.LogInformation("Token cleanup background service is starting.");
 
-            var lCurrentTimeUtc = DateTime.UtcNow;
+            var lCurrentTimeUtc = DateTimeOffset.Now;
             var lNext3AmUtc = lCurrentTimeUtc.Date.AddHours(27); // This gets 3 AM for the next day.
 
             // Calculate the time span until the next 3 AM UTC occurrence
