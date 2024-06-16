@@ -8,6 +8,7 @@ using TGF.CA.Application;
 using TGF.CA.Presentation;
 using TGF.CA.Presentation.Middleware;
 using TGF.CA.Presentation.MinimalAPI;
+using Common.Presentation;
 
 namespace APIGateway.API
 {
@@ -38,16 +39,7 @@ namespace APIGateway.API
         /// </summary>
         public static void UsePresentation(this WebApplication aWebApplication)
         {
-            if (aWebApplication.Environment.IsDevelopment())
-            {
-                aWebApplication.UseSwagger();
-                aWebApplication.UseSwaggerUI();
-            }
-            aWebApplication.MapHealthChecks(TGFEndpointRoutes.health, new HealthCheckOptions()
-            {
-                Predicate = _ => true,
-                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-            });
+            aWebApplication.UseCommonPresentation();
 
             //aWebApplication.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto });
             aWebApplication.UseCustomErrorHandlingMiddleware();
