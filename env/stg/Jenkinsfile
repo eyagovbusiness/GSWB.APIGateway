@@ -85,7 +85,7 @@ pipeline {
                     container('pytainer') {
                         withCredentials([usernamePassword(credentialsId: 'test-cred-for', passwordVariable: 'TOKEN', usernameVariable: 'USER')]) {
                             sh 'export PYTHONUNBUFFERED=1'
-                            sh "python3 request_check.py"
+                            sh "python3 sender.py"
                         }
                     }
                 }
