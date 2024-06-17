@@ -51,8 +51,8 @@ namespace APIGateway.API.Endpoints
         /// <summary>
         /// Triggers Discord OAuth in the backend resulting on success in a redirect response where an HTTP only server side cookie "PreAuthCookie" will be attached including information about the authenticated discord user.The redirection is protected by CORS policy.
         /// </summary>
-        private IResult Get_SignIn(HttpContext aHttpContext, IConfiguration aConfiguration)
-            => FinishSignIn(aHttpContext, aConfiguration);
+        private IResult Get_SignIn(string? redirectUrl, HttpContext aHttpContext, IConfiguration aConfiguration)
+            => FinishSignIn(redirectUrl, aHttpContext, aConfiguration);
 
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace APIGateway.API.Endpoints
             }
             finally //always redirect to frontend
             {
-                lResult = FinishSignIn(aHttpContext, aConfiguration);
+                lResult = FinishSignIn(null, aHttpContext, aConfiguration);
             }
             return lResult;
         }
@@ -109,25 +109,25 @@ namespace APIGateway.API.Endpoints
         /// <summary>
         /// Callback endpoint when OAuth with Discord fails.Redirects to the frontend.The redirection is protected by CORS policy.
         /// </summary>
-        private IResult Get_OAuthFiled(HttpContext aHttpContext, IConfiguration aConfiguration)
+        private IResult Get_OAuthFiled(string? redirectUrl, HttpContext aHttpContext, IConfiguration aConfiguration)
         {
             aHttpContext.Response.Headers.Append("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
             aHttpContext.Response.Headers.Append("Pragma", "no-cache");
             aHttpContext.Response.Headers.Append("Expires", "0");
 
-            return Results.Redirect(aConfiguration.GetValue<string>("FrontendURL") + aConfiguration.GetValue<string>("AuthCallbackFailedURI"), permanent: true);
+            return Results.Redirect((redirectUrl ?? aConfiguration.GetValue<string>("FrontendURL")) + aConfiguration.GetValue<string>("AuthCallbackFailedURI"), permanent: true);
         }
 
         #endregion
 
         #region Helpers
-        private IResult FinishSignIn(HttpContext aHttpContext, IConfiguration aConfiguration)
+        private IResult FinishSignIn(string? aRedirectUrl, HttpContext aHttpContext, IConfiguration aConfiguration)
         {
             aHttpContext.Response.Headers.Append("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
             aHttpContext.Response.Headers.Append("Pragma", "no-cache");
             aHttpContext.Response.Headers.Append("Expires", "0");
 
-            return Results.Redirect(aConfiguration.GetValue<string>("FrontendURL") + aConfiguration.GetValue<string>("AuthCallbackURI"), permanent: true);
+            return Results.Redirect((aRedirectUrl ?? aConfiguration.GetValue<string>("FrontendURL")) + aConfiguration.GetValue<string>("AuthCallbackURI"), permanent: true);
 
         }
         #endregion
