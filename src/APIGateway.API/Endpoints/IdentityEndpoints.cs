@@ -8,7 +8,6 @@ using Common.Application.DTOs.Members;
 using Common.Infrastructure.Communication.ApiRoutes;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TGF.CA.Application;
 using TGF.CA.Infrastructure.Security.Identity.Authentication;

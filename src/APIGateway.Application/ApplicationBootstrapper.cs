@@ -9,6 +9,8 @@ namespace APIGateway.Application
         public static void RegisterApplicationServices(this IServiceCollection aServiceList)
         {
             aServiceList.AddScoped<IConsentLegalService, ConsentLegalService>();
+            aServiceList.AddScoped<IGetConsentLegalService, GetConsentLegalService>();
+
         }
     }
 }

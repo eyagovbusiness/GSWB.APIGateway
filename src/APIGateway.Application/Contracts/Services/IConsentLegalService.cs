@@ -16,6 +16,6 @@ namespace APIGateway.Application.Contracts.Services
         /// <param name="aConsentLogDto">The information sent by the client about the consent given.</param>
         /// <param name="aCancellationToken"></param>
         /// <returns></returns>
-        Task<IHttpResult<ConsentLog>> ConsentLegal(string aUserIpAddress, ConsentLogDTO aConsentLogDto, CancellationToken aCancellationToken);
+        Task<IHttpResult<Guid>> ConsentLegal(string aUserIpAddress, ConsentLogDTO aConsentLogDto, CancellationToken aCancellationToken);
     }
 }

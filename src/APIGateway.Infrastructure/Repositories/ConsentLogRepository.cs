@@ -7,41 +7,15 @@ using TGF.Common.ROP.HttpResult;
 namespace APIGateway.Infrastructure.Repositories
 {
     public class ConsentLogRepository
-        (AuthDbContext aContext, ILogger<ConsentLogRepository> aLogger)
-         : RepositoryBase<ConsentLogRepository, AuthDbContext>(aContext, aLogger), IConsentLogRepository
+        (LegalDbContext aContext, ILogger<ConsentLogRepository> aLogger)
+         : RepositoryBase<ConsentLogRepository, LegalDbContext>(aContext, aLogger), IConsentLogRepository
     {
-
-        public Task<IHttpResult<ConsentLog>> AddAsync(ConsentLog aConsentLog, CancellationToken aCancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IHttpResult<ConsentLog>> DeleteAsync(Guid aConsentLogId, CancellationToken aCancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IHttpResult<ConsentLog>> UpdateAsync(ConsentLog aConsentLog, CancellationToken aCancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        //public ConsentLog GetAsync(Guid id)
-        //{
-        //    var consentLog = _context.ConsentLogs.Find(id);
-        //    if (consentLog != null)
-        //    {
-        //        consentLog.IpAddress = aEncryptionService.Decrypt(consentLog.IpAddress);
-        //    }
-        //    return consentLog;
-        //}
-
-        //public void AddAsync(ConsentLog consentLog)
-        //{
-        //    consentLog.IpAddress = aEncryptionService.Encrypt(consentLog.IpAddress);
-        //    _context.ConsentLogs.Add(consentLog);
-        //    _context.SaveChanges();
-        //}
+        public async Task<IHttpResult<ConsentLog>> GetByIdAsync(Guid aConsentLogId, CancellationToken aCancellationToken = default)
+        => await base.GetByIdAsync<ConsentLog, Guid>(aConsentLogId, aCancellationToken);
+        public async Task<IHttpResult<ConsentLog>> AddAsync(ConsentLog aConsentLog, CancellationToken aCancellationToken = default)
+        => await base.AddAsync(aConsentLog, aCancellationToken);
+        public async Task<IHttpResult<ConsentLog>> UpdateAsync(ConsentLog aConsentLog, CancellationToken aCancellationToken = default)
+        => await base.UpdateAsync(aConsentLog, aCancellationToken);
 
     }
 }
