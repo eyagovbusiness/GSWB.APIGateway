@@ -12,6 +12,8 @@
   <ItemGroup>
     <!--FIXING CVE-2019-0980-->
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
+    <!--FIXING CVE-2024-30105-->
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(DockerBuild)'=='false'">
