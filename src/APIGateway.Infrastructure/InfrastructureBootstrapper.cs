@@ -8,6 +8,7 @@ using Common.Application.Contracts.Services;
 using Common.Infrastructure;
 using Common.Infrastructure.Communication.HTTP;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.RateLimiting;
 using TGF.CA.Application;
@@ -82,14 +83,32 @@ namespace APIGateway.Infrastructure
         /// <returns>A task that represents the asynchronous operation.</returns>
         public static async Task UseInfrastructure(this WebApplication aWebApplication)
         {
+            // Forwarded headers middleware should come first
+            aWebApplication.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
+            // HTTPS redirection middleware
+            aWebApplication.UseHttpsRedirection();
+
+            // Custom middleware for blocking private proxying
             aWebApplication.UseMiddleware<BlockPrivateProxyingMiddleware>();
+
+            // Common infrastructure middleware
             aWebApplication.UseCommonInfrastructure();
+
+            // Apply migrations (ensure the database is up to date)
             await aWebApplication.UseMigrations<AuthDbContext>();
             await aWebApplication.UseMigrations<LegalDbContext>();
-            aWebApplication.UseMiddleware<TokenFilterMiddleware>();
-            aWebApplication.MapReverseProxy();
 
+            // Token filter middleware
+            aWebApplication.UseMiddleware<TokenFilterMiddleware>();
+
+            // Map reverse proxy
+            aWebApplication.MapReverseProxy();
         }
+
 
     }
 }
