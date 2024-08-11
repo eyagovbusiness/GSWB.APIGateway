@@ -1,4 +1,4 @@
-ARG BUILD_CONFIGURATION=Release ENVIRONMENT=testportal
+ARG BUILD_CONFIGURATION=Release ENVIRONMENT=development
 FROM registry.guildswarm.org/$ENVIRONMENT/common:latest AS base-packages
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build 
@@ -21,6 +21,7 @@ RUN dotnet publish "src/APIGateway.API/APIGateway.API.csproj" -c $BUILD_CONFIGUR
 FROM registry.guildswarm.org/baseimages/dotnet_base AS final 
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY combined.pfx .
 COPY Infrastructure/APIGatewayEntrypointOverride.sh ./entrypoint.sh
 COPY Infrastructure/ServiceAwait/wait_for_service.sh ./wait_for_service.sh
 COPY Infrastructure/ServiceAwait/IsReadyServer.sh ./IsReadyServer.sh
