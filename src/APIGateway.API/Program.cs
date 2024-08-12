@@ -18,8 +18,9 @@ lAPIGatewayApplicationBuilder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(5000); // HTTP port
     serverOptions.ListenAnyIP(5001, listenOptions =>
-    {
-        var certPath = Path.Combine(lAPIGatewayApplicationBuilder.Environment.ContentRootPath + "/certs", "combined.pfx");
+    {   
+        var certName = Environment.GetEnvironmentVariable("PFX_NAME");
+        var certPath = Path.Combine(lAPIGatewayApplicationBuilder.Environment.ContentRootPath + "/certs", certName);
         var certPassword = Environment.GetEnvironmentVariable("PFX_KEY");
 
         listenOptions.UseHttps(certPath, certPassword);
