@@ -19,9 +19,13 @@ lAPIGatewayApplicationBuilder.WebHost.ConfigureKestrel(serverOptions =>
     serverOptions.ListenAnyIP(5000); // HTTP port
     serverOptions.ListenAnyIP(5001, listenOptions =>
     {   
-        var certName = Environment.GetEnvironmentVariable("PFX_NAME");
-        var certPath = Path.Combine(lAPIGatewayApplicationBuilder.Environment.ContentRootPath + "/certs", certName);
+        var certRelativePath = Environment.GetEnvironmentVariable("PFX_PATH");
+        if (string.IsNullOrEmpty(certRelativePath))
+            throw new Exception("PFX_PATH environment variable is not set");
+        var certPath = Path.Combine(lAPIGatewayApplicationBuilder.Environment.ContentRootPath, certRelativePath);
         var certPassword = Environment.GetEnvironmentVariable("PFX_KEY");
+        if (string.IsNullOrEmpty(certPassword))
+            throw new Exception("PFX_KEY environment variable is not set");
 
         listenOptions.UseHttps(certPath, certPassword);
     }); // HTTPS port
