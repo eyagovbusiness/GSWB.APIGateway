@@ -26,4 +26,5 @@ COPY Infrastructure/ServiceAwait/wait_for_service.sh ./wait_for_service.sh
 COPY Infrastructure/ServiceAwait/IsReadyServer.sh ./IsReadyServer.sh
 USER root
 RUN chmod +x ./entrypoint.sh ./wait_for_service.sh ./IsReadyServer.sh
+RUN chown -R guildswarm:guildswarm /app
 USER guildswarm
