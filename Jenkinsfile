@@ -7,7 +7,7 @@ pipeline {
         USER=credentials('user_auto')
         TOKEN=credentials('token_auto')
         TOOL_LABEL="apigateway"
-        ENVIRONMENT = env.BRANCH_NAME
+        ENVIRONMENT = env.BRANCH_NAME ?: input message: 'Choose the environment to deploy', parameters: [choice(name: 'ENVIRONMENT', choices: ['testportal', 'staging', 'production'], description: 'Choose the environment to deploy')]
         REPO='testportal'
         IMAGE='api_gateway'
     }
