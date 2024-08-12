@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This script acts as a custom entrypoint that performs custom operations before and after starting a base Members ASP.NET service.
 
