@@ -1,4 +1,3 @@
-@Library('standard-library') _
 pipeline {
     agent {
         label 'imagechecker'
@@ -97,10 +96,10 @@ pipeline {
         always{
             sh 'rm -rf *'
         }
-        failure {
-            script{
-                pga.slack_webhook("backend")
-            }
-        }
+        //failure {
+        //    script{
+        //        pga.slack_webhook("backend")
+        //    }
+        //}
     }
 }
