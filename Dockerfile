@@ -24,4 +24,5 @@ COPY --from=publish /app/publish .
 COPY Infrastructure/APIGatewayEntrypointOverride.sh ./entrypoint.sh
 COPY Infrastructure/ServiceAwait/wait_for_service.sh ./wait_for_service.sh
 COPY Infrastructure/ServiceAwait/IsReadyServer.sh ./IsReadyServer.sh
+RUN chmod +x ./entrypoint.sh ./wait_for_service.sh ./IsReadyServer.sh
 ENTRYPOINT ["sh", "entrypoint.sh"]
