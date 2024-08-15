@@ -18,7 +18,7 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION
 RUN dotnet publish "src/APIGateway.API/APIGateway.API.csproj" -c $BUILD_CONFIGURATION --no-build -o /app/publish /p:UseAppHost=true /p:DockerBuild=true -r linux-musl-x64
 
-FROM registry.guildswarm.org/baseimages/dotnet_base AS final 
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final 
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY Infrastructure/APIGatewayEntrypointOverride.sh ./entrypoint.sh
