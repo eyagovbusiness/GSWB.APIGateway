@@ -61,7 +61,7 @@ pipeline {
                             // Move the credentials to a temporary location
                             sh "mv ${KUBECONFIG_FILE} ~/.kube/config"
                         }
-                        sh "kubectl delete pods -l app=${TOOL_LABEL}"
+                        sh "kubectl -n backend delete pods -l app=${TOOL_LABEL}"
                         // Clean up the kube config
                         sh "rm -f ~/.kube/config"
                     }
