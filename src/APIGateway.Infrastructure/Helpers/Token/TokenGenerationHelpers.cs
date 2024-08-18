@@ -133,7 +133,7 @@ namespace APIGateway.Infrastructure.Helpers.Token
         {
             var lHighestApplicationRole = aMemberDTO.GetHighestRole();
             return lHighestApplicationRole != null
-                ? ROPResult.Result.SuccessHttp<Claim>(new(ClaimTypes.Role, lHighestApplicationRole.DiscordRoleId))
+                ? ROPResult.Result.SuccessHttp<Claim>(new(ClaimTypes.Role, lHighestApplicationRole.Id))
                 : ROPResult.Result.Failure<Claim>(InfrastructureErrors.Identity.Claims.NoApplicationRoleFound);
         }
 
