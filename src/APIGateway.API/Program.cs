@@ -12,7 +12,7 @@ lAPIGatewayApplicationBuilder.Services.RegisterApplicationServices();
 lAPIGatewayApplicationBuilder.ConfigureCommonPresentation();
 lAPIGatewayApplicationBuilder.ConfigurePresentation();
 
-
+if (!lAPIGatewayApplicationBuilder.Environment.IsDevelopment())
 // TEMPORARY: Configure Kestrel to use HTTPS with the provided PFX certificate
 lAPIGatewayApplicationBuilder.WebHost.ConfigureKestrel(serverOptions =>
 {
