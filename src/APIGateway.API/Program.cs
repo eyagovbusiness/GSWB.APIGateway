@@ -38,7 +38,7 @@ lAPIGatewayWebApplication.UseForwardedHeaders(new ForwardedHeadersOptions
 });
 
 // Configurar el middleware para redirigir HTTP a HTTPS
-lAPIGatewayWebApplication.UseHttpsRedirection();
+//lAPIGatewayWebApplication.UseHttpsRedirection();
 await lAPIGatewayWebApplication.UseInfrastructure();
 lAPIGatewayWebApplication.UsePresentation();
 
