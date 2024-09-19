@@ -25,7 +25,7 @@ pipeline {
                     }
                     sh "kubectl exec -n vault vault-0 -- vault read -field=certificate ${VAULT_CA_ROUTE} > ${NAME_CERT}"
                     sh "rm -f ~/.kube/config"
-                    stash includes: 'super-ca.crt', name: 'ca-cert'
+                    stash includes: "${NAME_CERT}", name: 'ca-cert'
                 }
             }
         }
