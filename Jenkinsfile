@@ -20,9 +20,11 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: "kubernetes-${REPO}", variable: 'KUBECONFIG_FILE')]) {
+                        sh "chmod u+w ${KUBECONFIG_FILE}"
                         sh "mv ${KUBECONFIG_FILE} ~/.kube/config"
                     }
                     sh "kubectl exec -n vault vault-0 -- vault read -field=certificate ${VAULT_CA_ROUTE} > ${NAME_CERT}"
+                    sh "rm -f ~/.kube/config"
                     stash includes: 'super-ca.crt', name: 'ca-cert'
                 }
             }
