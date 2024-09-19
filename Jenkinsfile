@@ -9,18 +9,39 @@ pipeline {
         ENVIRONMENT = 'testportal'
         REPO = "${env.BRANCH_NAME}"
         IMAGE = 'api_gateway'
+        VAULT_CA_ROUTE = credentials('vault-cert-route')
+        NAME_CERT = "vault-ca.crt"
     }
     stages {
+        stage('Extract CA Certificate') {
+            agent {
+                label 'alpine_kubectl'
+            }
+            steps {
+                script {
+                    withCredentials([file(credentialsId: "kubernetes-${REPO}", variable: 'KUBECONFIG_FILE')]) {
+                        sh "mv ${KUBECONFIG_FILE} ~/.kube/config"
+                    }
+                    sh "kubectl exec -n vault vault-0 -- vault read -field=certificate ${VAULT_CA_ROUTE} > ${NAME_CERT}"
+                    stash includes: 'super-ca.crt', name: 'ca-cert'
+                }
+            }
+        }
         stage('Build Docker Images') {
             steps {
                 script {
+                    unstash 'ca-cert'
                     def version = readFile('version').trim()
                     env.VERSION = version
                     sh '''find . \\( -name "*.csproj" -o -name "*.sln" -o -name "NuGet.docker.config" \\) -print0 | tar -cvf projectfiles.tar -T -'''
                     try {
                         withCredentials([usernamePassword(credentialsId: "backend${REPO}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                             sh "docker login -u '${DOCKER_USERNAME}' -p '${DOCKER_PASSWORD}' ${REGISTRY}"
-                            sh "docker build . --build-arg ENVIRONMENT='${ENVIRONMENT}' -t ${REGISTRY}/${REPO}/${IMAGE}:${version} -t ${REGISTRY}/${REPO}/${IMAGE}:latest"
+                            sh "docker build . \
+                                --build-arg NAME_CERT=${NAME_CERT} \
+                                --build-arg ENVIRONMENT='${ENVIRONMENT}' \
+                                -t ${REGISTRY}/${REPO}/${IMAGE}:${version} \
+                                -t ${REGISTRY}/${REPO}/${IMAGE}:latest"
                             sh 'docker logout'
                         }
                     } finally {

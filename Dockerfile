@@ -3,6 +3,7 @@ FROM registry.guildswarm.org/$ENVIRONMENT/common:latest AS base-packages
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build 
 ARG BUILD_CONFIGURATION
+ARG NAME_CERT
 WORKDIR /src
 # Copy NuGet packages and project files from the base-packages image
 COPY --from=base-packages /app/BasePackages ./BasePackages
@@ -25,6 +26,8 @@ COPY Infrastructure/APIGatewayEntrypointOverride.sh ./entrypoint.sh
 COPY Infrastructure/ServiceAwait/wait_for_service.sh ./wait_for_service.sh
 COPY Infrastructure/ServiceAwait/IsReadyServer.sh ./IsReadyServer.sh
 USER root
+COPY ${NAME_CERT} /usr/local/share/ca-certificates/${NAME_CERT}
+RUN update-ca-certificates
 RUN chmod +x ./entrypoint.sh ./wait_for_service.sh ./IsReadyServer.sh
 RUN chown -R guildswarm:guildswarm /app
 USER guildswarm
