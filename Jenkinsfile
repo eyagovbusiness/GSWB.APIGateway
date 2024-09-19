@@ -52,6 +52,11 @@ pipeline {
                 }
             }
         }
+        stage('Test Vulnerabilities') {
+            steps {
+                sh "trivy image --exit-code 1 --quiet ${REGISTRY}/${REPO}/${IMAGE}:latest"
+            }
+        }
         stage('Push Docker Images') {
             steps {
                 script {

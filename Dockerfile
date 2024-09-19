@@ -26,7 +26,7 @@ COPY Infrastructure/APIGatewayEntrypointOverride.sh ./entrypoint.sh
 COPY Infrastructure/ServiceAwait/wait_for_service.sh ./wait_for_service.sh
 COPY Infrastructure/ServiceAwait/IsReadyServer.sh ./IsReadyServer.sh
 USER root
-COPY ${NAME_CERT} /usr/local/share/ca-certificates/${NAME_CERT}
+COPY $NAME_CERT /usr/local/share/ca-certificates/$NAME_CERT
 RUN update-ca-certificates
 RUN chmod +x ./entrypoint.sh ./wait_for_service.sh ./IsReadyServer.sh
 RUN chown -R guildswarm:guildswarm /app
