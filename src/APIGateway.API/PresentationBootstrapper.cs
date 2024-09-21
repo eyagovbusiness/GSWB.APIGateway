@@ -27,8 +27,7 @@ namespace APIGateway.API
 
             aWebApplicationBuilder.ConfigureDefaultPresentation(
                 new List<string> { lXmlDocFilePath },
-                aScanMarkerList: typeof(IdentityEndpoints),
-                aIsHttps:true
+                aScanMarkerList: typeof(IdentityEndpoints)
             );
 
             aWebApplicationBuilder.ConfigureFrontendCORS(aWebApplicationBuilder.Configuration);
