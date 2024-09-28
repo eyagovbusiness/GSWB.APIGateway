@@ -16,7 +16,7 @@ namespace APIGateway.Infrastructure
     /// </summary>
     internal class TokenPairAuthRecordRepository
         (AuthDbContext aContext, ILogger<TokenPairAuthRecordRepository> aLogger) 
-        : RepositoryBase<TokenPairAuthRecordRepository, AuthDbContext>(aContext, aLogger), ITokenPairAuthRecordRepository
+        : RepositoryBase<TokenPairAuthRecordRepository, AuthDbContext, TokenPairAuthRecord, Guid>(aContext, aLogger), ITokenPairAuthRecordRepository
     {
 
         #region ITokenPairAuthRecordRepository
@@ -25,12 +25,6 @@ namespace APIGateway.Infrastructure
             => await TryQueryAsync((aCancellationToken) => _context.TokenPairAuthRecords.FirstOrDefaultAsync(t => t.RefreshToken == aRefreshToken, aCancellationToken), aCancellationToken)
             .Verify(tokenPairAuthRecord => tokenPairAuthRecord != default, InfrastructureErrors.AuthDatabase.RefreshTokenNotFound);
 #pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
-
-        public async Task<IHttpResult<TokenPairAuthRecord>> AddAsync(TokenPairAuthRecord aTokenPairAuthRecord, CancellationToken aCancellationToken = default)
-            => await base.AddAsync(aTokenPairAuthRecord, aCancellationToken);
-
-        public async Task<IHttpResult<TokenPairAuthRecord>> UpdateAsync(TokenPairAuthRecord aTokenPairAuthRecord, CancellationToken aCancellationToken = default)
-            => await base.UpdateAsync(aTokenPairAuthRecord, aCancellationToken);
 
         public async Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordUserIdListAsync(IEnumerable<ulong> aDiscordUserIdList, CancellationToken aCancellationToken = default)
          => await RevokeTokenListAsync(await _context.TokenPairAuthRecords

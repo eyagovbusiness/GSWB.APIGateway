@@ -13,7 +13,7 @@ namespace APIGateway.Infrastructure.Migrations.LegalDb
 {
     [DbContext(typeof(LegalDbContext))]
     [Migration("20240803084307_timestamps")]
-    partial class timestamps
+    partial class Timestamps
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

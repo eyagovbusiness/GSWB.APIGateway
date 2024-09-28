@@ -13,7 +13,7 @@ namespace APIGateway.Infrastructure.Migrations.AuthDb
 {
     [DbContext(typeof(AuthDbContext))]
     [Migration("20240803084351_timestamps")]
-    partial class timestamps
+    partial class Timestamps
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
