@@ -1,5 +1,4 @@
-﻿using APIGateway.Application;
-using APIGateway.Domain.Entities;
+﻿using APIGateway.Domain.Entities;
 using Common.Application.Contracts.Services;
 using Common.Application.DTOs.Auth;
 using Common.Application.DTOs.Members;
@@ -20,6 +19,7 @@ namespace APIGateway.Infrastructure.Helpers.Token
     {
         public const int RefreshTokenByteLenght = 64;
         public static int RefreshTokenLength = 4 * ((RefreshTokenByteLenght + 2) / 3);
+        internal const string _guildId = "guildid";
         internal const string _issuerClaimType = "iss";
         internal const string _audienceClaimType = "aud";
 
@@ -61,6 +61,7 @@ namespace APIGateway.Infrastructure.Helpers.Token
                     {
                         new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new(ClaimTypes.NameIdentifier, aDiscordCookieUserInfo.UserNameIdentifier),
+                        new(_guildId,aMemberDTO.GuildId),
                         new(ClaimTypes.Name, aDiscordCookieUserInfo.UserName),
                         new(ClaimTypes.GivenName, aDiscordCookieUserInfo.GivenName ?? string.Empty),
                         new(_issuerClaimType, aIssuer ?? string.Empty),
