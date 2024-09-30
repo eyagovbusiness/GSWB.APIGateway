@@ -1,12 +1,14 @@
 using APIGateway.API;
 using APIGateway.Application;
 using APIGateway.Infrastructure;
+using Common.Domain;
 using Common.Presentation;
 using Microsoft.AspNetCore.HttpOverrides;
 
 
 WebApplicationBuilder lAPIGatewayApplicationBuilder = WebApplication.CreateBuilder(args);
 
+lAPIGatewayApplicationBuilder.ConfigureCommonDomain();
 await lAPIGatewayApplicationBuilder.ConfigureInfrastructureAsync();
 lAPIGatewayApplicationBuilder.Services.RegisterApplicationServices();
 lAPIGatewayApplicationBuilder.ConfigureCommonPresentation();

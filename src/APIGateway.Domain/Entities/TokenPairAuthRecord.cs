@@ -10,9 +10,9 @@ namespace APIGateway.Domain.Entities
     {
 
         /// <summary>
-        /// The authenticated discord user's id which generated this token pair.
+        /// The authenticated member's id which generated this token pair.
         /// </summary>
-        public ulong DiscordUserId { get; set; }
+        public Guid MemberId { get; set; }
 
         /// <summary>
         /// The Id of highest DiscordRole in the role's hierarchy(with RoleType = Application) which was givin the permissions to this token when it was created.

@@ -61,6 +61,7 @@ namespace APIGateway.Infrastructure.Helpers.Token
                         new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new(ClaimTypes.NameIdentifier, aDiscordCookieUserInfo.UserNameIdentifier),
                         new(GuildSwarmClaims.GuildId,aMemberDTO.GuildId),
+                        new(GuildSwarmClaims.MemberId,aMemberDTO.Id.ToString()),
                         new(ClaimTypes.Name, aDiscordCookieUserInfo.UserName),
                         new(ClaimTypes.GivenName, aDiscordCookieUserInfo.GivenName ?? string.Empty),
                         new(GuildSwarmClaims.IssuerClaimType, aIssuer ?? string.Empty),
@@ -88,7 +89,7 @@ namespace APIGateway.Infrastructure.Helpers.Token
                 MemberDTO lMemberDTO = default!;
                 Claim lPermissionsClaim = default!;
                 return await aMembersCommunicationService
-                .GetExistingMember(ulong.Parse(lClaimList.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)!.Value), aCancellationToken)
+                .GetExistingMember(lClaimList.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)!.Value, lClaimList.FirstOrDefault(x => x.Type == GuildSwarmClaims.GuildId)!.Value, aCancellationToken)
                 .Tap(memberDTO => lMemberDTO = memberDTO)
                 .Bind(memberDTO => GetPermissionsClaim(memberDTO))
                 .Tap(permissionClaim => lPermissionsClaim = permissionClaim)

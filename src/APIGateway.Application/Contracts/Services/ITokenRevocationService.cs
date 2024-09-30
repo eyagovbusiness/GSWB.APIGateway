@@ -12,10 +12,10 @@ namespace APIGateway.Application
         bool IsAccessTokenRevoked(string aJwtToken);
 
         /// <summary>
-        /// Mark as outdated all existing tokens related with any of the DiscordUser ID list provided.
+        /// Mark as outdated all existing tokens related with any of the Member Id list provided.
         /// </summary>
-        /// <param name="aDiscordUserIdList">List of all DiscordUser ID used to revoke the tokens.</param>
-        Task OutdateByDiscordUserListAsync(ulong[] aDiscordUserIdList, CancellationToken aCancellationToken);
+        /// <param name="memberIdList">List of all Member Id used to revoke the tokens.</param>
+        Task OutdateByDiscordUserListAsync(Guid[] memberIdList, CancellationToken cancellationToken);
 
         /// <summary>
         /// Mark as outdated all existing tokens related with any of the DiscordRole id list provided.

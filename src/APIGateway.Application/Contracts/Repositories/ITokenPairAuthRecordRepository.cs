@@ -24,10 +24,10 @@ namespace APIGateway.Application
         /// <summary>
         /// Revokes the tokens for a list of DiscordUser IDs.
         /// </summary>
-        /// <param name="aDiscordUserIdList">The list of DiscordUser IDs.</param>
+        /// <param name="memberIdList">The list of DiscordUser IDs.</param>
         /// <param name="aCancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The list of AccessTokens revoked or Error.</returns>
-        Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordUserIdListAsync(IEnumerable<ulong> aDiscordUserIdList, CancellationToken aCancellationToken = default);
+        Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordUserIdListAsync(IEnumerable<Guid> memberIdList, CancellationToken aCancellationToken = default);
 
         /// <summary>
         /// Revokes the tokens for a list of DiscordRole IDs.

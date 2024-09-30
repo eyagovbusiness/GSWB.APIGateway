@@ -5,7 +5,9 @@ using APIGateway.Infrastructure.Helpers.Token;
 using Common.Application.Contracts.Services;
 using Common.Application.DTOs.Auth;
 using Common.Application.DTOs.Members;
+using Common.Domain.Validation;
 using Common.Infrastructure.Communication.ApiRoutes;
+using Common.Infrastructure.Communication.HTTP;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -33,7 +35,7 @@ namespace APIGateway.API.Endpoints
             aWebApplication.MapGet(APIGatewayApiRoutes.Auth_testerSignIn.Route, Get_TesterSignIn).RequireDiscord().SetResponseMetadata(301);
             aWebApplication.MapPut(APIGatewayApiRoutes.Auth_signUp.Route, Put_SignUp).RequireDiscord().SetResponseMetadata<MemberDetailDTO>(200, 400);
             aWebApplication.MapPut(APIGatewayApiRoutes.Auth_signOut.Route, Put_SignOut).RequireDiscord().RequireJWTBearer().SetResponseMetadata(200, 400, 404);
-            aWebApplication.MapGet(APIGatewayApiRoutes.Auth_token.Route, Get_TokenPair).RequireDiscord().SetResponseMetadata<TokenPairDTO>(200, 404);
+            aWebApplication.MapGet(APIGatewayApiRoutes.Auth_token_guildId.Route, Get_TokenPair).RequireDiscord().SetResponseMetadata<TokenPairDTO>(200, 404);
             aWebApplication.MapPut(APIGatewayApiRoutes.Auth_token_refresh.Route, Put_AccessTokenRefresh).SetResponseMetadata<string>(200, 400, 404);
             aWebApplication.MapGet(TGFEndpointRoutes.auth_OAuthFailed, Get_OAuthFiled).SetResponseMetadata(301);
         }
@@ -83,8 +85,10 @@ namespace APIGateway.API.Endpoints
         /// <summary>
         /// Get a new pair of access token and refresh token using the "PreAuthCookie" retrieved after /signIn.
         /// </summary>
-        private async Task<IResult> Get_TokenPair(ITokenService aTokenService, ClaimsPrincipal aClaims, CancellationToken aCancellationToken = default)
-            => await aTokenService.GetNewTokenPairAsync(aClaims, aCancellationToken)
+        private async Task<IResult> Get_TokenPair(string guildId, ITokenService aTokenService, ClaimsPrincipal aClaims, DiscordIdValidator discordIdValidator, IMembersCommunicationService membersCommunicationService, CancellationToken aCancellationToken = default)
+            => await Result.ValidationResult(discordIdValidator.Validate(guildId))
+            .Bind(_ => membersCommunicationService.GetExistingMember(TokenGenerationHelpers.GetDiscordCookieUserInfo(aClaims).UserNameIdentifier, guildId, aCancellationToken))
+            .Bind(member => aTokenService.GetNewTokenPairAsync(guildId, aClaims, aCancellationToken))
             .ToIResult();
 
         /// <summary>

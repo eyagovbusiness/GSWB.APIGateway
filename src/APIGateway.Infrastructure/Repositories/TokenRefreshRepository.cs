@@ -26,9 +26,9 @@ namespace APIGateway.Infrastructure
             .Verify(tokenPairAuthRecord => tokenPairAuthRecord != default, InfrastructureErrors.AuthDatabase.RefreshTokenNotFound);
 #pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
 
-        public async Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordUserIdListAsync(IEnumerable<ulong> aDiscordUserIdList, CancellationToken aCancellationToken = default)
+        public async Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordUserIdListAsync(IEnumerable<Guid> memberIdList, CancellationToken aCancellationToken = default)
          => await RevokeTokenListAsync(await _context.TokenPairAuthRecords
-            .Where(tokensRecord => aDiscordUserIdList.Contains(tokensRecord.DiscordUserId) && !tokensRecord.IsOutdated)
+            .Where(tokensRecord => memberIdList.Contains(tokensRecord.MemberId) && !tokensRecord.IsOutdated)
             .ToListAsync(aCancellationToken), aCancellationToken);
 
         public async Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordRoleIdListAsync(IEnumerable<ulong> aDiscordRoleIdList, CancellationToken aCancellationToken = default)

@@ -11,6 +11,6 @@ namespace APIGateway.Infrastructure.Communication.MessageConsumer
         private readonly ITokenRevocationService _tokenRevocationService = aTokenRevocationService;
 
         public async Task Handle(IntegrationMessage<MemberTokenRevoked> aIntegrationMessage, CancellationToken aCancellationToken = default)
-            => await _tokenRevocationService.OutdateByDiscordUserListAsync(aIntegrationMessage.Content.DiscordUserIdList.Select(ulong.Parse).ToArray(), aCancellationToken);
+            => await _tokenRevocationService.OutdateByDiscordUserListAsync(aIntegrationMessage.Content.MemberIdList.ToArray(), aCancellationToken);
     }
 }
