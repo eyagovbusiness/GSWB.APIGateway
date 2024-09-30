@@ -4,6 +4,7 @@ using Common.Application.DTOs.Auth;
 using Common.Application.DTOs.Members;
 using Common.Application.DTOs.ProcessingHelpers;
 using Common.Domain.ValueObjects;
+using Common.Infrastructure.Security;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -19,9 +20,7 @@ namespace APIGateway.Infrastructure.Helpers.Token
     {
         public const int RefreshTokenByteLenght = 64;
         public static int RefreshTokenLength = 4 * ((RefreshTokenByteLenght + 2) / 3);
-        internal const string _guildId = "guildid";
-        internal const string _issuerClaimType = "iss";
-        internal const string _audienceClaimType = "aud";
+
 
         /// <summary>
         /// Get the DiscordCookie claims.
@@ -61,11 +60,11 @@ namespace APIGateway.Infrastructure.Helpers.Token
                     {
                         new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new(ClaimTypes.NameIdentifier, aDiscordCookieUserInfo.UserNameIdentifier),
-                        new(_guildId,aMemberDTO.GuildId),
+                        new(GuildSwarmClaims.GuildId,aMemberDTO.GuildId),
                         new(ClaimTypes.Name, aDiscordCookieUserInfo.UserName),
                         new(ClaimTypes.GivenName, aDiscordCookieUserInfo.GivenName ?? string.Empty),
-                        new(_issuerClaimType, aIssuer ?? string.Empty),
-                        new(_audienceClaimType, aAudience ?? string.Empty),
+                        new(GuildSwarmClaims.IssuerClaimType, aIssuer ?? string.Empty),
+                        new(GuildSwarmClaims.AudienceClaimType, aAudience ?? string.Empty),
                         roleClaim,
                         lPermissionsClaim!
                     } as IEnumerable<Claim>
