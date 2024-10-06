@@ -1,9 +1,11 @@
 ﻿using APIGateway.API.Validation;
 using APIGateway.Application;
 using APIGateway.Application.DTOs;
+using APIGateway.Application.UseCases;
 using APIGateway.Infrastructure.Helpers.Token;
 using Common.Application.Contracts.Services;
 using Common.Application.DTOs.Auth;
+using Common.Application.DTOs.Guilds;
 using Common.Application.DTOs.Members;
 using Common.Domain.Validation;
 using Common.Infrastructure.Communication.ApiRoutes;
@@ -18,6 +20,7 @@ using TGF.CA.Presentation.Middleware;
 using TGF.CA.Presentation.MinimalAPI;
 using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
+using static Common.Infrastructure.Communication.ApiRoutes.APIGatewayApiRoutes;
 
 namespace APIGateway.API.Endpoints
 {
@@ -33,6 +36,7 @@ namespace APIGateway.API.Endpoints
         {
             aWebApplication.MapGet(APIGatewayApiRoutes.Auth_signIn.Route, Get_SignIn).RequireDiscord().SetResponseMetadata(301);
             aWebApplication.MapGet(APIGatewayApiRoutes.Auth_testerSignIn.Route, Get_TesterSignIn).RequireDiscord().SetResponseMetadata(301);
+            aWebApplication.MapGet(APIGatewayApiRoutes.Auth_user_guilds.Route, Get_UserGuilds).RequireDiscord().SetResponseMetadata<GuildDTO[]>(200);
             aWebApplication.MapPut(APIGatewayApiRoutes.Auth_signUp.Route, Put_SignUp).RequireDiscord().SetResponseMetadata<MemberDetailDTO>(200, 400);
             aWebApplication.MapPut(APIGatewayApiRoutes.Auth_signOut.Route, Put_SignOut).RequireDiscord().RequireJWTBearer().SetResponseMetadata(200, 400, 404);
             aWebApplication.MapGet(APIGatewayApiRoutes.Auth_token_guildId.Route, Get_TokenPair).RequireDiscord().SetResponseMetadata<TokenPairDTO>(200, 404);
@@ -74,6 +78,13 @@ namespace APIGateway.API.Endpoints
             }
             return lResult;
         }
+
+        /// <summary>
+        /// Get the list of avaliable guild of the currently authenticated discord user.
+        /// </summary>
+        private async Task<IResult> Get_UserGuilds(ClaimsPrincipal claimsPrincipal, ListUserGuilds listUserGuildsUseCase, CancellationToken cancellationToken = default)
+        => await listUserGuildsUseCase.ExecuteAsync(claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier)!, cancellationToken)
+        .ToIResult();
 
         /// <summary>
         /// Creates a member account in database using the "PreAuthCookie" retrieved after /signIn. The response contains the details about the new member created.
