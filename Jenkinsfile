@@ -54,7 +54,7 @@ pipeline {
         }
         stage('Test Vulnerabilities') {
             steps {
-                ehcho "Trivy can't download the DB from the internet, so we need to skip it for now"
+                echo "Trivy can't download the DB from the internet, so we need to skip it for now"
                 //sh "trivy image --exit-code 1 --quiet ${REGISTRY}/${REPO}/${IMAGE}:latest"
             }
         }
