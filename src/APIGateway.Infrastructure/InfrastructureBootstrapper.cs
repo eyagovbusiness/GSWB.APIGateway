@@ -96,7 +96,7 @@ namespace APIGateway.Infrastructure
             aWebApplication.UseMiddleware<BlockPrivateProxyingMiddleware>();
 
             // Common infrastructure middleware
-            aWebApplication.UseCommonInfrastructure();
+            await aWebApplication.UseCommonInfrastructure();
 
             // Apply migrations (ensure the database is up to date)
             await aWebApplication.UseMigrations<AuthDbContext>();

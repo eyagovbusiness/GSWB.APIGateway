@@ -9,7 +9,6 @@ using Common.Application.DTOs.Guilds;
 using Common.Application.DTOs.Members;
 using Common.Domain.Validation;
 using Common.Infrastructure.Communication.ApiRoutes;
-using Common.Infrastructure.Communication.HTTP;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -20,7 +19,6 @@ using TGF.CA.Presentation.Middleware;
 using TGF.CA.Presentation.MinimalAPI;
 using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
-using static Common.Infrastructure.Communication.ApiRoutes.APIGatewayApiRoutes;
 
 namespace APIGateway.API.Endpoints
 {
@@ -82,9 +80,22 @@ namespace APIGateway.API.Endpoints
         /// <summary>
         /// Get the list of avaliable guild of the currently authenticated discord user.
         /// </summary>
-        private async Task<IResult> Get_UserGuilds(ClaimsPrincipal claimsPrincipal, ListUserGuilds listUserGuildsUseCase, CancellationToken cancellationToken = default)
-        => await listUserGuildsUseCase.ExecuteAsync(claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier)!, cancellationToken)
-        .ToIResult();
+        private async Task<IResult> Get_UserGuilds(HttpContext httpContext, ClaimsPrincipal claimsPrincipal, ListUserGuilds listUserGuildsUseCase, CancellationToken cancellationToken = default)
+        {
+            // Extract the cookie
+            if (!httpContext.Request.Cookies.TryGetValue("PreAuthCookie", out string? cookieValue))
+            {
+                return Results.BadRequest("PreAuthCookie not found");
+            }
+
+            // Construct the cookie string with the name and value
+            var cookieHeader = $"PreAuthCookie={cookieValue}";
+
+            // Call the HttpCommunicationService with the cookie
+            return await listUserGuildsUseCase
+                .ExecuteAsync(cookieHeader, cancellationToken)
+                .ToIResult();
+        }
 
         /// <summary>
         /// Creates a member account in database using the "PreAuthCookie" retrieved after /signIn. The response contains the details about the new member created.

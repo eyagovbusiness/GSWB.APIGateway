@@ -8,9 +8,9 @@ namespace APIGateway.Application.UseCases
     public class ListUserGuilds(ISwarmBotCommunicationService swarmBotCommunicationService)
         : IUseCase<IHttpResult<IEnumerable<GuildDTO>>, string>
     {
-        public async Task<IHttpResult<IEnumerable<GuildDTO>>> ExecuteAsync(string discordUserId, CancellationToken cancellationToken = default)
+        public async Task<IHttpResult<IEnumerable<GuildDTO>>> ExecuteAsync(string cookieHeader, CancellationToken cancellationToken = default)
         {
-            return await swarmBotCommunicationService.GetUserGuildList(discordUserId, cancellationToken);
+            return await swarmBotCommunicationService.GetUserGuildList(cookieHeader, cancellationToken);
         }
     }
 }
