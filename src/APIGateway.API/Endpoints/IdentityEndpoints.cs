@@ -67,7 +67,8 @@ namespace APIGateway.API.Endpoints
             IResult lResult = default!;
             try
             {
-                _ = await aSwarmBotCommunicationService.GetIsTester(aHttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value)
+                var guildSwarmDiscordServerId = aConfiguration.GetValue<string>("GuildSwarmDiscordServerId") ?? throw new Exception("GuildSwarmDiscordServerId was not set in appsettings.");
+                _ = await aSwarmBotCommunicationService.GetIsTester(guildSwarmDiscordServerId, aHttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value)
                     .Bind(testerId => aAllowMeCommunicationService.AllowUser(testerId));
             }
             finally //always redirect to frontend
