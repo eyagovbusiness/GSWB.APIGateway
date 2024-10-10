@@ -23,7 +23,7 @@ namespace APIGateway.Infrastructure
         public async Task<IHttpResult<TokenPairAuthRecord>> GetByRefreshTokenAsync(string aRefreshToken, CancellationToken aCancellationToken = default)
 #pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
             => await TryQueryAsync((aCancellationToken) => _context.TokenPairAuthRecords.FirstOrDefaultAsync(t => t.RefreshToken == aRefreshToken, aCancellationToken), aCancellationToken)
-            .Verify(tokenPairAuthRecord => tokenPairAuthRecord != default, InfrastructureErrors.AuthDatabase.RefreshTokenNotFound);
+            .Verify(tokenPairAuthRecord => tokenPairAuthRecord! != default!, InfrastructureErrors.AuthDatabase.RefreshTokenNotFound);
 #pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
 
         public async Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordUserIdListAsync(IEnumerable<Guid> memberIdList, CancellationToken aCancellationToken = default)
@@ -54,7 +54,7 @@ namespace APIGateway.Infrastructure
             var lTokenRecordToDelete = _context.TokenPairAuthRecords
                 .FirstOrDefault(t => t.RefreshToken == aRefreshToken);
 
-            if (lTokenRecordToDelete != null)
+            if (lTokenRecordToDelete! != null!)
                 _context.TokenPairAuthRecords.Remove(lTokenRecordToDelete!);
 
             return Unit.Value;
