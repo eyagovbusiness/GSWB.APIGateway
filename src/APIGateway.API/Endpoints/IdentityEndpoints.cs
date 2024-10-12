@@ -81,22 +81,10 @@ namespace APIGateway.API.Endpoints
         /// <summary>
         /// Get the list of avaliable guild of the currently authenticated discord user.
         /// </summary>
-        private async Task<IResult> Get_UserGuilds(HttpContext httpContext, ClaimsPrincipal claimsPrincipal, ListUserGuilds listUserGuildsUseCase, CancellationToken cancellationToken = default)
-        {
-            // Extract the cookie
-            if (!httpContext.Request.Cookies.TryGetValue("PreAuthCookie", out string? cookieValue))
-            {
-                return Results.BadRequest("PreAuthCookie not found");
-            }
-
-            // Construct the cookie string with the name and value
-            var cookieHeader = $"PreAuthCookie={cookieValue}";
-
-            // Call the HttpCommunicationService with the cookie
-            return await listUserGuildsUseCase
-                .ExecuteAsync(cookieHeader, cancellationToken)
-                .ToIResult();
-        }
+        private async Task<IResult> Get_UserGuilds(ClaimsPrincipal claimsPrincipal, ListUserGuilds listUserGuildsUseCase, CancellationToken cancellationToken = default)
+        => await listUserGuildsUseCase
+        .ExecuteAsync(claimsPrincipal, cancellationToken)
+        .ToIResult();
 
         /// <summary>
         /// Creates a member account in database using the "PreAuthCookie" retrieved after /signIn. The response contains the details about the new member created.
