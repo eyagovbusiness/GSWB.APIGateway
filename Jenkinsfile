@@ -6,7 +6,7 @@ pipeline {
     environment {
         REGISTRY = 'registry.guildswarm.org'
         TOOL_LABEL = "apigateway"
-        ENVIRONMENT = "${env.BRANCH_NAME == 'develop' ? 'staging' : (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? 'production' : env.BRANCH_NAME}"
+        ENVIRONMENT = "${env.BRANCH_NAME == 'integration' ? 'staging' : (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? 'production' : env.BRANCH_NAME}"
         IMAGE = 'api_gateway'
         VAULT_CA_ROUTE = credentials('vault-cert-route')
         NAME_CERT = "vault-ca.crt"
