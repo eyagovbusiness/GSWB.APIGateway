@@ -1,5 +1,5 @@
 ﻿using APIGateway.Application;
-using Common.Infrastructure.Communication.Messages;
+using Common.Application.Contracts.Communication.Messages;
 using TGF.CA.Infrastructure.Communication.Consumer.Handler;
 using TGF.CA.Infrastructure.Communication.Messages;
 

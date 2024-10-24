@@ -1,6 +1,6 @@
 ﻿using APIGateway.Application.Contracts.Services;
+using Common.Application.Communication.Routing;
 using Common.Application.DTOs.Legal;
-using Common.Infrastructure.Communication.ApiRoutes;
 using TGF.CA.Presentation;
 using TGF.CA.Presentation.Middleware;
 using TGF.CA.Presentation.MinimalAPI;
