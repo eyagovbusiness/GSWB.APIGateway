@@ -2,7 +2,6 @@
 using APIGateway.Infrastructure.Communication.MessageConsumer;
 using APIGateway.Infrastructure.HealthChecks;
 using APIGateway.Infrastructure.Middleware;
-using APIGateway.Infrastructure.Repositories;
 using APIGateway.Infrastructure.Services;
 using Common.Application.Contracts.Services;
 using Common.Infrastructure;
@@ -10,11 +9,13 @@ using Common.Infrastructure.Communication.HTTP;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using System.Threading.RateLimiting;
 using TGF.CA.Application;
 using TGF.CA.Infrastructure;
 using TGF.CA.Infrastructure.Communication.RabbitMQ;
 using TGF.CA.Infrastructure.DB.PostgreSQL;
+using TGF.CA.Infrastructure.DB.Repository;
 
 namespace APIGateway.Infrastructure
 {
@@ -39,8 +40,7 @@ namespace APIGateway.Infrastructure
 
             await aWebApplicationBuilder.Services.AddPostgreSQL<AuthDbContext>("AuthDb");
             await aWebApplicationBuilder.Services.AddPostgreSQL<LegalDbContext>("LegalDb");
-            aWebApplicationBuilder.Services.AddScoped<ITokenPairAuthRecordRepository, TokenPairAuthRecordRepository>();
-            aWebApplicationBuilder.Services.AddScoped<IConsentLogRepository, ConsentLogRepository>();
+            aWebApplicationBuilder.Services.AddRepositories(Assembly.GetExecutingAssembly());
             aWebApplicationBuilder.Services.AddScoped<ITokenService, TokenService>();
             aWebApplicationBuilder.Services.AddSingleton<ITokenRevocationService, TokenRevocationService>();
 
