@@ -3,7 +3,6 @@ using APIGateway.Application;
 using APIGateway.Application.DTOs;
 using APIGateway.Application.UseCases;
 using APIGateway.Infrastructure.Helpers.Token;
-using BGSFX.CA.Presentation.MinimalAPI;
 using Common.Application.Communication.Routing;
 using Common.Application.Contracts.Services;
 using Common.Application.DTOs.Auth;

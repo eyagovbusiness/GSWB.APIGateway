@@ -1,5 +1,4 @@
 ﻿using APIGateway.Application.Contracts.Services;
-using BGSFX.CA.Presentation.MinimalAPI;
 using Common.Application.Communication.Routing;
 using Common.Application.DTOs.Legal;
 using TGF.CA.Presentation;
