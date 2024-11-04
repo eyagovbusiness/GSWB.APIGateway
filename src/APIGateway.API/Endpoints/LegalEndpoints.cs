@@ -1,8 +1,8 @@
 ﻿using APIGateway.Application.Contracts.Services;
+using BGSFX.CA.Presentation.MinimalAPI;
 using Common.Application.Communication.Routing;
 using Common.Application.DTOs.Legal;
 using TGF.CA.Presentation;
-using TGF.CA.Presentation.Middleware;
 using TGF.CA.Presentation.MinimalAPI;
 using static TGF.CA.Presentation.ApiRoutes;
 
@@ -10,7 +10,7 @@ namespace APIGateway.API.Endpoints
 {
 
     /// <inheritdoc/>
-    public class LegalEndpoints : IEndpointDefinition
+    public class LegalEndpoints : IEndpointsDefinition
     {
 
         #region IEndpointDefinition

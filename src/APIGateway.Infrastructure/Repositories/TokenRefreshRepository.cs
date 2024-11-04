@@ -7,15 +7,16 @@ using TGF.CA.Infrastructure.DB.Repository;
 using TGF.Common.ROP;
 using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
+using TGF.Common.ROP.HttpResult.RailwaySwitches;
 
-namespace APIGateway.Infrastructure
+namespace APIGateway.Infrastructure.Repositories
 {
 
     /// <summary>
     /// Implementation of <see cref="ITokenPairAuthRecordRepository"/> that operates over the <see cref="AuthDbContext"/> database context.
     /// </summary>
     internal class TokenPairAuthRecordRepository
-        (AuthDbContext aContext, ILogger<TokenPairAuthRecordRepository> aLogger) 
+        (AuthDbContext aContext, ILogger<TokenPairAuthRecordRepository> aLogger)
         : RepositoryBase<TokenPairAuthRecordRepository, AuthDbContext, TokenPairAuthRecord, Guid>(aContext, aLogger), ITokenPairAuthRecordRepository
     {
 
@@ -45,7 +46,7 @@ namespace APIGateway.Infrastructure
             return 0;
         }
         , aCancellationToken
-        , aSaveResultOverride: (int aChangeCount, int aCommandResult)
+        , aSaveResultOverride: (aChangeCount, aCommandResult)
         => Result.SuccessHttp(aChangeCount));
 
         public async Task<IHttpResult<Unit>> DeleteByRefreshTokenAsync(string aRefreshToken, CancellationToken aCancellationToken = default)
@@ -60,7 +61,7 @@ namespace APIGateway.Infrastructure
             return Unit.Value;
         }
         , aCancellationToken
-        , aSaveResultOverride: (int aChangeCount, Unit aCommandResult)
+        , aSaveResultOverride: (aChangeCount, aCommandResult)
         => aChangeCount > 0
             ? Result.SuccessHttp(aCommandResult)
             : Result.Failure<Unit>(InfrastructureErrors.AuthDatabase.RefreshTokenNotFound));
@@ -81,7 +82,7 @@ namespace APIGateway.Infrastructure
             return lTokenListToRevoke.Select(t => t.AccessToken).ToImmutableArray();
         }
         , aCancellationToken
-        , aSaveResultOverride: (int aChangeCount, ImmutableArray<string> aCommandResult)
+        , aSaveResultOverride: (aChangeCount, aCommandResult)
         => aChangeCount >= aCommandResult.Length
             ? Result.SuccessHttp(aCommandResult)
             : Result.Failure<ImmutableArray<string>>(InfrastructureErrors.AuthDatabase.NotAllTokenRevocationSaved));

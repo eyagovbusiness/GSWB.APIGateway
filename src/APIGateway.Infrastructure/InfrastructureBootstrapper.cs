@@ -13,7 +13,7 @@ using System.Reflection;
 using System.Threading.RateLimiting;
 using TGF.CA.Application;
 using TGF.CA.Infrastructure;
-using TGF.CA.Infrastructure.Communication.RabbitMQ;
+using TGF.CA.Infrastructure.Comm.RabbitMQ;
 using TGF.CA.Infrastructure.DB.PostgreSQL;
 using TGF.CA.Infrastructure.DB.Repository;
 

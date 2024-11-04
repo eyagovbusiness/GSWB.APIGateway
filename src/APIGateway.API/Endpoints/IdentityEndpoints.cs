@@ -3,6 +3,7 @@ using APIGateway.Application;
 using APIGateway.Application.DTOs;
 using APIGateway.Application.UseCases;
 using APIGateway.Infrastructure.Helpers.Token;
+using BGSFX.CA.Presentation.MinimalAPI;
 using Common.Application.Communication.Routing;
 using Common.Application.Contracts.Services;
 using Common.Application.DTOs.Auth;
@@ -13,18 +14,17 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TGF.CA.Application.Contracts.Routing;
-using TGF.CA.Infrastructure.Security.Identity.Authentication;
+using TGF.CA.Infrastructure.Identity.Authentication;
 using TGF.CA.Presentation;
-using TGF.CA.Presentation.Middleware;
 using TGF.CA.Presentation.MinimalAPI;
-using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
+using TGF.Common.ROP.HttpResult.RailwaySwitches;
 
 namespace APIGateway.API.Endpoints
 {
 
     /// <inheritdoc/>
-    public class IdentityEndpoints : IEndpointDefinition
+    public class IdentityEndpoints : IEndpointsDefinition
     {
 
         #region IEndpointDefinition

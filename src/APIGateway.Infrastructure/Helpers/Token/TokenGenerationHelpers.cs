@@ -13,6 +13,7 @@ using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
 using Result = TGF.Common.ROP.Result.Result;
 using ROPResult = TGF.Common.ROP.Result;
+using TGF.Common.ROP.HttpResult.RailwaySwitches;
 
 namespace APIGateway.Infrastructure.Helpers.Token
 {

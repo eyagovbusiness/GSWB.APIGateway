@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
+using TGF.Common.ROP.HttpResult.RailwaySwitches;
 
 namespace APIGateway.Infrastructure.Helpers.Token
 {
