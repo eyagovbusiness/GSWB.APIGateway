@@ -7,7 +7,7 @@ namespace APIGateway.Infrastructure.Repositories
 {
     public class ConsentLogRepository
         (LegalDbContext aContext, ILogger<ConsentLogRepository> aLogger)
-         : RepositoryBase<ConsentLogRepository, LegalDbContext, ConsentLog, Guid>(aContext, aLogger), IConsentLogRepository
+         : EntityRepository<ConsentLogRepository, LegalDbContext, ConsentLog, Guid>(aContext, aLogger), IConsentLogRepository
     {
 
     }

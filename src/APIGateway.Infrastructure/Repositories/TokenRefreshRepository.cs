@@ -17,7 +17,7 @@ namespace APIGateway.Infrastructure.Repositories
     /// </summary>
     internal class TokenPairAuthRecordRepository
         (AuthDbContext aContext, ILogger<TokenPairAuthRecordRepository> aLogger)
-        : RepositoryBase<TokenPairAuthRecordRepository, AuthDbContext, TokenPairAuthRecord, Guid>(aContext, aLogger), ITokenPairAuthRecordRepository
+        : EntityRepository<TokenPairAuthRecordRepository, AuthDbContext, TokenPairAuthRecord, Guid>(aContext, aLogger), ITokenPairAuthRecordRepository
     {
 
         #region ITokenPairAuthRecordRepository
@@ -45,9 +45,8 @@ namespace APIGateway.Infrastructure.Repositories
             _context.TokenPairAuthRecords.RemoveRange(expiredRecords);
             return 0;
         }
-        , aCancellationToken
-        , aSaveResultOverride: (aChangeCount, aCommandResult)
-        => Result.SuccessHttp(aChangeCount));
+        , aSaveResultOverride: (aChangeCount, aCommandResult) => Result.SuccessHttp(aChangeCount)
+        , aCancellationToken);
 
         public async Task<IHttpResult<Unit>> DeleteByRefreshTokenAsync(string aRefreshToken, CancellationToken aCancellationToken = default)
         => await TryCommandAsync(() =>
@@ -60,11 +59,11 @@ namespace APIGateway.Infrastructure.Repositories
 
             return Unit.Value;
         }
-        , aCancellationToken
         , aSaveResultOverride: (aChangeCount, aCommandResult)
-        => aChangeCount > 0
-            ? Result.SuccessHttp(aCommandResult)
-            : Result.Failure<Unit>(InfrastructureErrors.AuthDatabase.RefreshTokenNotFound));
+            => aChangeCount > 0
+                ? Result.SuccessHttp(aCommandResult)
+                : Result.Failure<Unit>(InfrastructureErrors.AuthDatabase.RefreshTokenNotFound)
+        , aCancellationToken);
 
         #endregion
 
@@ -81,11 +80,11 @@ namespace APIGateway.Infrastructure.Repositories
 
             return lTokenListToRevoke.Select(t => t.AccessToken).ToImmutableArray();
         }
-        , aCancellationToken
         , aSaveResultOverride: (aChangeCount, aCommandResult)
         => aChangeCount >= aCommandResult.Length
             ? Result.SuccessHttp(aCommandResult)
-            : Result.Failure<ImmutableArray<string>>(InfrastructureErrors.AuthDatabase.NotAllTokenRevocationSaved));
+            : Result.Failure<ImmutableArray<string>>(InfrastructureErrors.AuthDatabase.NotAllTokenRevocationSaved)
+        ,aCancellationToken);
 
         #endregion
 
