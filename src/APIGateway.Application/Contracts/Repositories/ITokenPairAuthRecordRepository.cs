@@ -10,7 +10,7 @@ namespace APIGateway.Application
     /// Represents operations that can be performed on a repository of token pairs for authentication records.
     /// </summary>
     /// <remarks>Serves for IoC with the Infrastructure layer(which now depends on the Application layer)</remarks>
-    public interface ITokenPairAuthRecordRepository: IEntitiyRepository<TokenPairAuthRecord, Guid>
+    public interface ITokenPairAuthRecordRepository: IEntityRepository<TokenPairAuthRecord, Guid>
     {
 
         /// <summary>

@@ -6,7 +6,7 @@ namespace APIGateway.Application
     /// <summary>
     /// Repository to work with the ConsentLog entities in the LegalDb
     /// </summary>
-    public interface IConsentLogRepository : IEntitiyRepository<ConsentLog, Guid>
+    public interface IConsentLogRepository : IEntityRepository<ConsentLog, Guid>
     {
 
     }

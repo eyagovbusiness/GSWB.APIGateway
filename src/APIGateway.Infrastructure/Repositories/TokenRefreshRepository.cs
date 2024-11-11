@@ -3,11 +3,11 @@ using APIGateway.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Immutable;
-using TGF.CA.Infrastructure.DB.Repository;
 using TGF.Common.ROP;
 using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
 using TGF.Common.ROP.HttpResult.RailwaySwitches;
+using TGF.CA.Infrastructure.DB.Repository;
 
 namespace APIGateway.Infrastructure.Repositories
 {
