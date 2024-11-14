@@ -1,12 +1,13 @@
 using APIGateway.API;
 using APIGateway.Application;
 using APIGateway.Infrastructure;
+using Common.Domain;
 using Common.Presentation;
-using Microsoft.AspNetCore.HttpOverrides;
 
 
 WebApplicationBuilder lAPIGatewayApplicationBuilder = WebApplication.CreateBuilder(args);
 
+lAPIGatewayApplicationBuilder.ConfigureCommonDomain();
 await lAPIGatewayApplicationBuilder.ConfigureInfrastructureAsync();
 lAPIGatewayApplicationBuilder.Services.RegisterApplicationServices();
 lAPIGatewayApplicationBuilder.ConfigureCommonPresentation();
@@ -32,13 +33,7 @@ lAPIGatewayApplicationBuilder.WebHost.ConfigureKestrel(serverOptions =>
 });
 
 var lAPIGatewayWebApplication = lAPIGatewayApplicationBuilder.Build();
-lAPIGatewayWebApplication.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
 
-// Configurar el middleware para redirigir HTTP a HTTPS
-//lAPIGatewayWebApplication.UseHttpsRedirection();
 await lAPIGatewayWebApplication.UseInfrastructure();
 lAPIGatewayWebApplication.UsePresentation();
 

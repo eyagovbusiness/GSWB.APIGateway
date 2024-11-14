@@ -1,10 +1,10 @@
-﻿using APIGateway.Application;
-using APIGateway.Domain.Entities;
+﻿using APIGateway.Domain.Entities;
 using Common.Application.Contracts.Services;
 using Common.Application.DTOs.Auth;
 using Common.Application.DTOs.Members;
 using Common.Application.DTOs.ProcessingHelpers;
 using Common.Domain.ValueObjects;
+using Common.Infrastructure.Security;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -13,6 +13,7 @@ using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
 using Result = TGF.Common.ROP.Result.Result;
 using ROPResult = TGF.Common.ROP.Result;
+using TGF.Common.ROP.HttpResult.RailwaySwitches;
 
 namespace APIGateway.Infrastructure.Helpers.Token
 {
@@ -20,8 +21,7 @@ namespace APIGateway.Infrastructure.Helpers.Token
     {
         public const int RefreshTokenByteLenght = 64;
         public static int RefreshTokenLength = 4 * ((RefreshTokenByteLenght + 2) / 3);
-        internal const string _issuerClaimType = "iss";
-        internal const string _audienceClaimType = "aud";
+
 
         /// <summary>
         /// Get the DiscordCookie claims.
@@ -50,21 +50,23 @@ namespace APIGateway.Infrastructure.Helpers.Token
         /// Get a new list of claims for the provided member <see cref="aMemberDTO"/> and the discordCookie data <see cref="aDiscordCookieUserInfo"/>.
         /// </summary>
         /// <returns>List of claims related to the authenticated member.</returns>
-        internal static IHttpResult<IEnumerable<Claim>> GetNewClaims(DiscordCookieUserInfo aDiscordCookieUserInfo, MemberDTO aMemberDTO, string? aIssuer = default, string? aAudience = default)
+        internal static IHttpResult<IEnumerable<Claim>> GetNewClaims(DiscordCookieUserInfo aDiscordCookieUserInfo, MemberDetailDTO aMemberDetailDTO, string? aIssuer = default, string? aAudience = default)
         {
             Claim lPermissionsClaim = default!;
-            return GetPermissionsClaim(aMemberDTO)
+            return GetPermissionsClaim(aMemberDetailDTO)
                 .Tap(permissionsClaim => lPermissionsClaim = permissionsClaim)
-                .Bind(_ => GetRoleClaim(aMemberDTO))
+                .Bind(_ => GetRoleClaim(aMemberDetailDTO))
                 .Map(roleClaim =>
                     new List<Claim>
                     {
                         new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new(ClaimTypes.NameIdentifier, aDiscordCookieUserInfo.UserNameIdentifier),
+                        new(GuildSwarmClaims.GuildId,aMemberDetailDTO.GuildId),
+                        new(GuildSwarmClaims.MemberId,aMemberDetailDTO.Id.ToString()),
                         new(ClaimTypes.Name, aDiscordCookieUserInfo.UserName),
                         new(ClaimTypes.GivenName, aDiscordCookieUserInfo.GivenName ?? string.Empty),
-                        new(_issuerClaimType, aIssuer ?? string.Empty),
-                        new(_audienceClaimType, aAudience ?? string.Empty),
+                        new(GuildSwarmClaims.IssuerClaimType, aIssuer ?? string.Empty),
+                        new(GuildSwarmClaims.AudienceClaimType, aAudience ?? string.Empty),
                         roleClaim,
                         lPermissionsClaim!
                     } as IEnumerable<Claim>
@@ -85,10 +87,10 @@ namespace APIGateway.Infrastructure.Helpers.Token
             var lClaimList = aClaimsPrincipal.Claims.ToList();
             if (aTokenPairAuthRecord.IsOutdated)
             {
-                MemberDTO lMemberDTO = default!;
+                MemberDetailDTO lMemberDTO = default!;
                 Claim lPermissionsClaim = default!;
                 return await aMembersCommunicationService
-                .GetExistingMember(ulong.Parse(lClaimList.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)!.Value), aCancellationToken)
+                .GetExistingMember(lClaimList.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)!.Value, lClaimList.FirstOrDefault(x => x.Type == GuildSwarmClaims.GuildId)!.Value, aCancellationToken)
                 .Tap(memberDTO => lMemberDTO = memberDTO)
                 .Bind(memberDTO => GetPermissionsClaim(memberDTO))
                 .Tap(permissionClaim => lPermissionsClaim = permissionClaim)
@@ -113,12 +115,12 @@ namespace APIGateway.Infrastructure.Helpers.Token
         /// </summary>
         /// <param name="aMemberDTO">Member from who to obtain the permissios claim.</param>
         /// <returns>Member's permissions claim.</returns>
-        internal static IHttpResult<Claim> GetPermissionsClaim(MemberDTO aMemberDTO)
+        internal static IHttpResult<Claim> GetPermissionsClaim(MemberDetailDTO aMemberDetailDTO)
         {
-            if (aMemberDTO.Status == MemberStatusEnum.Banned)
+            if (aMemberDetailDTO.Status == MemberStatusEnum.Banned)
                 return ROPResult.Result.SuccessHttp<Claim>(new(DefaultApplicationClaimTypes.Permissions, ((int)PermissionsEnum.None).ToString()));
 
-            var lHighestApplicationRole = aMemberDTO.GetHighestRole();
+            var lHighestApplicationRole = aMemberDetailDTO.GetHighestRole();
             return lHighestApplicationRole != null
                 ? ROPResult.Result.SuccessHttp<Claim>(new(DefaultApplicationClaimTypes.Permissions, ((int)lHighestApplicationRole.Permissions).ToString()))
                 : ROPResult.Result.Failure<Claim>(InfrastructureErrors.Identity.Claims.NoApplicationRoleFound);
@@ -129,9 +131,9 @@ namespace APIGateway.Infrastructure.Helpers.Token
         /// </summary>
         /// <param name="aMemberDTO">Member from who to obtain the Role claim.</param>
         /// <returns>Member's Role claim.</returns>
-        internal static IHttpResult<Claim> GetRoleClaim(MemberDTO aMemberDTO)
+        internal static IHttpResult<Claim> GetRoleClaim(MemberDetailDTO aMemberDetailDTO)
         {
-            var lHighestApplicationRole = aMemberDTO.GetHighestRole();
+            var lHighestApplicationRole = aMemberDetailDTO.GetHighestRole();
             return lHighestApplicationRole != null
                 ? ROPResult.Result.SuccessHttp<Claim>(new(ClaimTypes.Role, lHighestApplicationRole.Id))
                 : ROPResult.Result.Failure<Claim>(InfrastructureErrors.Identity.Claims.NoApplicationRoleFound);

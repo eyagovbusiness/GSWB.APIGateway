@@ -1,6 +1,6 @@
 ﻿using Common.Infrastructure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using TGF.CA.Infrastructure.Communication.Health;
+using TGF.CA.Infrastructure.Comm.Health;
 using TGF.CA.Infrastructure.Discovery;
 
 namespace APIGateway.Infrastructure.HealthChecks.Microservices

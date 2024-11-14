@@ -16,6 +16,7 @@ using TGF.Common.ROP;
 using TGF.Common.ROP.Errors;
 using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
+using TGF.Common.ROP.HttpResult.RailwaySwitches;
 using static APIGateway.Infrastructure.Helpers.Token.TokenGenerationHelpers;
 using static APIGateway.Infrastructure.Helpers.Token.TokenValidationHelpers;
 
@@ -54,12 +55,12 @@ namespace APIGateway.Infrastructure.Services
 
         #region ITokenService implementation
 
-        public async Task<IHttpResult<TokenPairDTO>> GetNewTokenPairAsync(ClaimsPrincipal aClaimsPrincipal, CancellationToken aCancellationToken = default)
+        public async Task<IHttpResult<TokenPairDTO>> GetNewTokenPairAsync(string guildId, ClaimsPrincipal aClaimsPrincipal, CancellationToken aCancellationToken = default)
         {
             DiscordCookieUserInfo? lDiscordCookieUserInfo = default;
             return await Result.CancellationTokenResultAsync(aCancellationToken)
                 .Tap(_ => lDiscordCookieUserInfo = GetDiscordCookieUserInfo(aClaimsPrincipal))
-                .Bind(_ => _membersCommunicationService.GetExistingMember(ulong.Parse(lDiscordCookieUserInfo!.UserNameIdentifier), aCancellationToken))
+                .Bind(_ => _membersCommunicationService.GetExistingMember(lDiscordCookieUserInfo!.UserNameIdentifier, guildId, aCancellationToken))
                 .Bind(memberDTO => GetNewClaims(lDiscordCookieUserInfo!, memberDTO, _issuer, _issuer))
                 .Bind(claims => GenerateNewTokenPairAsync(claims, aCancellationToken));
 
@@ -81,8 +82,8 @@ namespace APIGateway.Infrastructure.Services
                 .Verify(token => token != null && token.Length >= 1, InfrastructureErrors.AuthTokenRefresh.ServerError);
         }
 
-        public async Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForMemberListAsync(IEnumerable<ulong> aDiscordUserIdList, CancellationToken aCancellationToken = default)
-        => await _tokenPairAuthRecordRepository.RevokeByDiscordUserIdListAsync(aDiscordUserIdList, aCancellationToken);
+        public async Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForMemberListAsync(IEnumerable<Guid> memberIdList, CancellationToken aCancellationToken = default)
+        => await _tokenPairAuthRecordRepository.RevokeByDiscordUserIdListAsync(memberIdList, aCancellationToken);
 
         public async Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForRoleListAsync(IEnumerable<ulong> aDiscordRoleIdList, CancellationToken aCancellationToken = default)
         => await _tokenPairAuthRecordRepository.RevokeByDiscordRoleIdListAsync(aDiscordRoleIdList, aCancellationToken);
@@ -127,7 +128,7 @@ namespace APIGateway.Infrastructure.Services
             var lGetAccessTokenResult = await Result.CancellationTokenResult(aCancellationToken)
                 .Bind(_ => GenerateAccessToken(aClaims, aCancellationToken));
 
-            ulong lDiscordUserId = Convert.ToUInt64(aClaims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+            Guid lDiscordUserId = Guid.Parse(aClaims.First(claim => claim.Type == GuildSwarmClaims.MemberId).Value);
             ulong lDiscordRoleId = Convert.ToUInt64(aClaims.First(claim => claim.Type == ClaimTypes.Role).Value);
             string lRefreshToken = default!;
             return await lGetAccessTokenResult
@@ -169,14 +170,14 @@ namespace APIGateway.Infrastructure.Services
         /// Stores in the auth database the pair of Access and Refresh tokens, making persistent the relationship between both for future refresh requests.
         /// </summary>
         /// <returns>The new record that was created or Error.</returns>
-        private async Task<IHttpResult<TokenPairAuthRecord>> SaveNewTokenPairAuthRecordAsync(string aAccessToken, string aRefreshToken, ulong aDiscordUserId, ulong aDiscordRoleId, CancellationToken aCancellationToken = default)
+        private async Task<IHttpResult<TokenPairAuthRecord>> SaveNewTokenPairAuthRecordAsync(string aAccessToken, string aRefreshToken, Guid memberId, ulong aDiscordRoleId, CancellationToken aCancellationToken = default)
         => await Result.CancellationTokenResult(aCancellationToken)
         .Map(_ => new TokenPairAuthRecord()
         {
             AccessToken = aAccessToken,
             RefreshToken = aRefreshToken,
             IsOutdated = false,
-            DiscordUserId = aDiscordUserId,
+            MemberId = memberId,
             DiscordRoleId = aDiscordRoleId,
             ExpiryDate = DateTimeOffset.Now.Add(_refreshTokenLifetime)
         })

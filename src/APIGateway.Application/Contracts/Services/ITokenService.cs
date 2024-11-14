@@ -19,7 +19,7 @@ namespace APIGateway.Application
         /// </summary>
         /// <param name="aClaimsPrincipal"><see cref="ClaimsPrincipal"/> from the authenticated user by the PreAuthCookie.</param>
         /// <returns>A newly generated <see cref="TokenPairDTO"/> or null.</returns>
-        Task<IHttpResult<TokenPairDTO>> GetNewTokenPairAsync(ClaimsPrincipal aClaimsPrincipal, CancellationToken aCancellationToken = default);
+        Task<IHttpResult<TokenPairDTO>> GetNewTokenPairAsync(string guildId, ClaimsPrincipal aClaimsPrincipal, CancellationToken aCancellationToken = default);
 
         /// <summary>
         /// Retrieves a refreshed access token asynchronously.Only outdated or expired tokens can be refreshed.
@@ -31,9 +31,9 @@ namespace APIGateway.Application
         /// <summary>
         /// Mark as outdated all the <see cref="TokenPairAuthRecord"/> related with any of the provided DiscordUser ID.
         /// </summary>
-        /// <param name="aDiscordUserIdList">The list of members identified by the DiscordUser IDs whose tokens need to be revoked.</param>
+        /// <param name="memberIdList">The list of members identified by the DiscordUser IDs whose tokens need to be revoked.</param>
         /// <returns>List of <see cref="string"/> with the revoked access tokens.</returns>
-        Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForMemberListAsync(IEnumerable<ulong> aDiscordUserIdList, CancellationToken aCancellationToken = default);
+        Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForMemberListAsync(IEnumerable<Guid> memberIdList, CancellationToken aCancellationToken = default);
 
         /// <summary>
         /// Mark as outdated all the <see cref="TokenPairAuthRecord"/> related with any of the provided DiscordRole ID.

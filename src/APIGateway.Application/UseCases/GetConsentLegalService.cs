@@ -2,6 +2,7 @@
 using APIGateway.Domain.Entities;
 using TGF.CA.Application;
 using TGF.Common.ROP.HttpResult;
+using TGF.Common.ROP.HttpResult.RailwaySwitches;
 using TGF.Common.ROP.Result;
 
 namespace APIGateway.Application.UseCases

@@ -1,27 +1,29 @@
 ﻿using APIGateway.API.Validation;
 using APIGateway.Application;
 using APIGateway.Application.DTOs;
+using APIGateway.Application.UseCases;
 using APIGateway.Infrastructure.Helpers.Token;
+using Common.Application.Communication.Routing;
 using Common.Application.Contracts.Services;
 using Common.Application.DTOs.Auth;
+using Common.Application.DTOs.Guilds;
 using Common.Application.DTOs.Members;
-using Common.Infrastructure.Communication.ApiRoutes;
+using Common.Domain.Validation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using TGF.CA.Application;
-using TGF.CA.Infrastructure.Security.Identity.Authentication;
+using TGF.CA.Application.Contracts.Routing;
+using TGF.CA.Infrastructure.Identity.Authentication;
 using TGF.CA.Presentation;
-using TGF.CA.Presentation.Middleware;
 using TGF.CA.Presentation.MinimalAPI;
-using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
+using TGF.Common.ROP.HttpResult.RailwaySwitches;
 
 namespace APIGateway.API.Endpoints
 {
 
     /// <inheritdoc/>
-    public class IdentityEndpoints : IEndpointDefinition
+    public class IdentityEndpoints : IEndpointsDefinition
     {
 
         #region IEndpointDefinition
@@ -31,9 +33,10 @@ namespace APIGateway.API.Endpoints
         {
             aWebApplication.MapGet(APIGatewayApiRoutes.Auth_signIn.Route, Get_SignIn).RequireDiscord().SetResponseMetadata(301);
             aWebApplication.MapGet(APIGatewayApiRoutes.Auth_testerSignIn.Route, Get_TesterSignIn).RequireDiscord().SetResponseMetadata(301);
+            aWebApplication.MapGet(APIGatewayApiRoutes.Auth_user_guilds.Route, Get_UserGuilds).RequireDiscord().SetResponseMetadata<GuildDTO[]>(200);
             aWebApplication.MapPut(APIGatewayApiRoutes.Auth_signUp.Route, Put_SignUp).RequireDiscord().SetResponseMetadata<MemberDetailDTO>(200, 400);
             aWebApplication.MapPut(APIGatewayApiRoutes.Auth_signOut.Route, Put_SignOut).RequireDiscord().RequireJWTBearer().SetResponseMetadata(200, 400, 404);
-            aWebApplication.MapGet(APIGatewayApiRoutes.Auth_token.Route, Get_TokenPair).RequireDiscord().SetResponseMetadata<TokenPairDTO>(200, 404);
+            aWebApplication.MapGet(APIGatewayApiRoutes.Auth_token_guildId.Route, Get_TokenPair).RequireDiscord().SetResponseMetadata<TokenPairDTO>(200, 404);
             aWebApplication.MapPut(APIGatewayApiRoutes.Auth_token_refresh.Route, Put_AccessTokenRefresh).SetResponseMetadata<string>(200, 400, 404);
             aWebApplication.MapGet(TGFEndpointRoutes.auth_OAuthFailed, Get_OAuthFiled).SetResponseMetadata(301);
         }
@@ -63,7 +66,8 @@ namespace APIGateway.API.Endpoints
             IResult lResult = default!;
             try
             {
-                _ = await aSwarmBotCommunicationService.GetIsTester(aHttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value)
+                var guildSwarmDiscordServerId = aConfiguration.GetValue<string>("GuildSwarmDiscordServerId") ?? throw new Exception("GuildSwarmDiscordServerId was not set in appsettings.");
+                _ = await aSwarmBotCommunicationService.GetIsTester(guildSwarmDiscordServerId, aHttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value)
                     .Bind(testerId => aAllowMeCommunicationService.AllowUser(testerId));
             }
             finally //always redirect to frontend
@@ -74,17 +78,27 @@ namespace APIGateway.API.Endpoints
         }
 
         /// <summary>
+        /// Get the list of avaliable guild of the currently authenticated discord user.
+        /// </summary>
+        private async Task<IResult> Get_UserGuilds(ClaimsPrincipal claimsPrincipal, ListUserGuilds listUserGuildsUseCase, CancellationToken cancellationToken = default)
+        => await listUserGuildsUseCase
+        .ExecuteAsync(claimsPrincipal, cancellationToken)
+        .ToIResult();
+
+        /// <summary>
         /// Creates a member account in database using the "PreAuthCookie" retrieved after /signIn. The response contains the details about the new member created.
         /// </summary>
-        private async Task<IResult> Put_SignUp([FromBody] SignUpDataDTO? aSignUpData, ClaimsPrincipal aClaims, IMembersCommunicationService aMembersCommunicationService, CancellationToken aCancellationToken = default)
-            => await aMembersCommunicationService.SignUpNewMember(aSignUpData, TokenGenerationHelpers.GetDiscordCookieUserInfo(aClaims), aCancellationToken)
+        private async Task<IResult> Put_SignUp([FromBody] SignUpDataDTO? aSignUpData, string guildId, ClaimsPrincipal aClaims, IMembersCommunicationService aMembersCommunicationService, CancellationToken aCancellationToken = default)
+            => await aMembersCommunicationService.SignUpNewMember(aSignUpData, TokenGenerationHelpers.GetDiscordCookieUserInfo(aClaims), guildId, aCancellationToken)
             .ToIResult();
 
         /// <summary>
         /// Get a new pair of access token and refresh token using the "PreAuthCookie" retrieved after /signIn.
         /// </summary>
-        private async Task<IResult> Get_TokenPair(ITokenService aTokenService, ClaimsPrincipal aClaims, CancellationToken aCancellationToken = default)
-            => await aTokenService.GetNewTokenPairAsync(aClaims, aCancellationToken)
+        private async Task<IResult> Get_TokenPair(string guildId, ITokenService aTokenService, ClaimsPrincipal aClaims, DiscordIdValidator discordIdValidator, IMembersCommunicationService membersCommunicationService, CancellationToken aCancellationToken = default)
+            => await Result.ValidationResult(discordIdValidator.Validate(guildId))
+            .Bind(_ => membersCommunicationService.GetExistingMember(TokenGenerationHelpers.GetDiscordCookieUserInfo(aClaims).UserNameIdentifier, guildId, aCancellationToken))
+            .Bind(member => aTokenService.GetNewTokenPairAsync(guildId, aClaims, aCancellationToken))
             .ToIResult();
 
         /// <summary>

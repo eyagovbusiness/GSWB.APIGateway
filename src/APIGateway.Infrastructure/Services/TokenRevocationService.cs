@@ -40,13 +40,13 @@ namespace APIGateway.Infrastructure.Services
             return false;
         }
 
-        public async Task OutdateByDiscordUserListAsync(ulong[] aDiscordUserIdList, CancellationToken aCancellationToken)
+        public async Task OutdateByDiscordUserListAsync(Guid[] memberIdList, CancellationToken aCancellationToken)
         {
             ImmutableArray<string> lListOfRevokedTokens = [];
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var lTokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
-                var lRevocationResult = await lTokenService.OutdateTokenPairForMemberListAsync(aDiscordUserIdList, aCancellationToken);
+                var lRevocationResult = await lTokenService.OutdateTokenPairForMemberListAsync(memberIdList, aCancellationToken);
                 if (!lRevocationResult.IsSuccess)
                     throw new Exception("Error revoking tokens in DB, security may be compromised!!");
 

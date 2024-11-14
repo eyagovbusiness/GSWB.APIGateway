@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using TGF.CA.Application.Contracts.Routing;
 using TGF.CA.Infrastructure.Middleware.Security;
 
 namespace APIGateway.Infrastructure.Middleware

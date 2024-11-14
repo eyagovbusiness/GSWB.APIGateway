@@ -1,7 +1,7 @@
 ﻿using APIGateway.Application;
-using Common.Infrastructure.Communication.Messages;
-using TGF.CA.Infrastructure.Communication.Consumer.Handler;
-using TGF.CA.Infrastructure.Communication.Messages;
+using Common.Application.Contracts.Communication.Messages;
+using TGF.CA.Infrastructure.Comm.Consumer.Handler;
+using TGF.CA.Infrastructure.Comm.Messages;
 
 namespace APIGateway.Infrastructure.Communication.MessageConsumer
 {
@@ -11,6 +11,6 @@ namespace APIGateway.Infrastructure.Communication.MessageConsumer
         private readonly ITokenRevocationService _tokenRevocationService = aTokenRevocationService;
 
         public async Task Handle(IntegrationMessage<MemberTokenRevoked> aIntegrationMessage, CancellationToken aCancellationToken = default)
-            => await _tokenRevocationService.OutdateByDiscordUserListAsync(aIntegrationMessage.Content.DiscordUserIdList.Select(ulong.Parse).ToArray(), aCancellationToken);
+            => await _tokenRevocationService.OutdateByDiscordUserListAsync(aIntegrationMessage.Content.MemberIdList.ToArray(), aCancellationToken);
     }
 }

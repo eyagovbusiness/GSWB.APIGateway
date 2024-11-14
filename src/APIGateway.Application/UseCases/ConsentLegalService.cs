@@ -3,6 +3,7 @@ using APIGateway.Application.Mapping;
 using Common.Application.DTOs.Legal;
 using TGF.CA.Application;
 using TGF.Common.ROP.HttpResult;
+using TGF.Common.ROP.HttpResult.RailwaySwitches;
 
 namespace APIGateway.Application.UseCases
 {

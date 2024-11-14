@@ -39,14 +39,14 @@ namespace APIGateway.Infrastructure.Migrations.AuthDb
                     b.Property<decimal>("DiscordRoleId")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<decimal>("DiscordUserId")
-                        .HasColumnType("numeric(20,0)");
-
                     b.Property<DateTimeOffset>("ExpiryDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsOutdated")
                         .HasColumnType("boolean");
+
+                    b.Property<Guid>("MemberId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");

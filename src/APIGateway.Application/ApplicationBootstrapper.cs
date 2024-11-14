@@ -1,6 +1,8 @@
 ﻿using APIGateway.Application.Contracts.Services;
 using APIGateway.Application.UseCases;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+using TGF.CA.Application.UseCases;
 
 namespace APIGateway.Application
 {
@@ -10,6 +12,7 @@ namespace APIGateway.Application
         {
             aServiceList.AddScoped<IConsentLegalService, ConsentLegalService>();
             aServiceList.AddScoped<IGetConsentLegalService, GetConsentLegalService>();
+            aServiceList.AddUseCases(Assembly.GetExecutingAssembly());
 
         }
     }
