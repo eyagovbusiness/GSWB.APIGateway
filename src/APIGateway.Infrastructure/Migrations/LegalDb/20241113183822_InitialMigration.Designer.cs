@@ -9,59 +9,62 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace APIGateway.Infrastructure.Migrations.AuthDb
+namespace APIGateway.Infrastructure.Migrations.LegalDb
 {
-    [DbContext(typeof(AuthDbContext))]
-    [Migration("20240803084351_timestamps")]
-    partial class Timestamps
+    [DbContext(typeof(LegalDbContext))]
+    [Migration("20241113183822_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("APIGateway.Domain.Entities.TokenPairAuthRecord", b =>
+            modelBuilder.Entity("APIGateway.Domain.Entities.ConsentLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AccessToken")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)");
+                    b.Property<DateTimeOffset>("ConsentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<byte>("ConsentMethod")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte>("ConsentType")
+                        .HasColumnType("smallint");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("DiscordRoleId")
-                        .HasColumnType("numeric(20,0)");
+                    b.Property<string>("Geolocation")
+                        .HasColumnType("text");
 
-                    b.Property<decimal>("DiscordUserId")
-                        .HasColumnType("numeric(20,0)");
-
-                    b.Property<DateTimeOffset>("ExpiryDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsOutdated")
-                        .HasColumnType("boolean");
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTimeOffset>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("RefreshToken")
+                    b.Property<string>("PrivacyPolicyVersion")
                         .IsRequired()
-                        .HasMaxLength(88)
-                        .HasColumnType("character varying(88)");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("TokenPairAuthRecords");
+                    b.ToTable("ConsentLogs");
                 });
 #pragma warning restore 612, 618
         }

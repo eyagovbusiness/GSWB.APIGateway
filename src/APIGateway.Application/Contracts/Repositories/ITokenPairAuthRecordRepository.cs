@@ -1,4 +1,5 @@
 ﻿using APIGateway.Domain.Entities;
+using Common.Domain.ValueObjects;
 using System.Collections.Immutable;
 using TGF.CA.Domain.Contracts.Repositories.EntityRepository;
 using TGF.Common.ROP;
@@ -27,7 +28,7 @@ namespace APIGateway.Application
         /// <param name="memberIdList">The list of DiscordUser IDs.</param>
         /// <param name="aCancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The list of AccessTokens revoked or Error.</returns>
-        Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordUserIdListAsync(IEnumerable<Guid> memberIdList, CancellationToken aCancellationToken = default);
+        Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordUserIdListAsync(IEnumerable<MemberKey> memberIdList, CancellationToken aCancellationToken = default);
 
         /// <summary>
         /// Revokes the tokens for a list of DiscordRole IDs.
@@ -35,7 +36,7 @@ namespace APIGateway.Application
         /// <param name="aDiscordRoleIdList">The list of DiscordRole IDs.</param>
         /// <param name="aCancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>The list of AccessTokens revoked or Error.</returns>
-        Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordRoleIdListAsync(IEnumerable<ulong> aDiscordRoleIdList, CancellationToken aCancellationToken = default);
+        Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordRoleIdListAsync(IEnumerable<RoleKey> aDiscordRoleIdList, CancellationToken aCancellationToken = default);
 
         /// <summary>
         /// Deletes all expired records.

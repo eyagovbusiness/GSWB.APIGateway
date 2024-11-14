@@ -1,4 +1,6 @@
 ﻿
+using Common.Domain.ValueObjects;
+
 namespace APIGateway.Application
 {
     public interface ITokenRevocationService
@@ -15,13 +17,13 @@ namespace APIGateway.Application
         /// Mark as outdated all existing tokens related with any of the Member Id list provided.
         /// </summary>
         /// <param name="memberIdList">List of all Member Id used to revoke the tokens.</param>
-        Task OutdateByDiscordUserListAsync(Guid[] memberIdList, CancellationToken cancellationToken);
+        Task OutdateByDiscordUserListAsync(IEnumerable<MemberKey> memberIdList, CancellationToken cancellationToken);
 
         /// <summary>
         /// Mark as outdated all existing tokens related with any of the DiscordRole id list provided.
         /// </summary>
-        /// <param name="aDiscordRoleIdList">List of all DiscordRole ID used to revoke the tokens.</param>
-        Task OutdateByDiscordRoleListAsync(ulong[] aDiscordRoleIdList, CancellationToken aCancellationToken);
+        /// <param name="roleIdList">List of all DiscordRole ID used to revoke the tokens.</param>
+        Task OutdateByDiscordRoleListAsync(IEnumerable<RoleKey> roleIdList, CancellationToken aCancellationToken);
 
         /// <summary>
         /// Adds to the black list a given list of access tokens. Requests with a blacklisted token will result in a 401 unauthorized response.

@@ -17,7 +17,7 @@ namespace APIGateway.Infrastructure.Migrations.AuthDb
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -36,17 +36,11 @@ namespace APIGateway.Infrastructure.Migrations.AuthDb
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("DiscordRoleId")
-                        .HasColumnType("numeric(20,0)");
-
                     b.Property<DateTimeOffset>("ExpiryDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsOutdated")
                         .HasColumnType("boolean");
-
-                    b.Property<Guid>("MemberId")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
@@ -59,6 +53,53 @@ namespace APIGateway.Infrastructure.Migrations.AuthDb
                     b.HasKey("Id");
 
                     b.ToTable("TokenPairAuthRecords");
+                });
+
+            modelBuilder.Entity("APIGateway.Domain.Entities.TokenPairAuthRecord", b =>
+                {
+                    b.OwnsOne("Common.Domain.ValueObjects.MemberKey", "MemberId", b1 =>
+                        {
+                            b1.Property<Guid>("TokenPairAuthRecordId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<decimal>("GuildId")
+                                .HasColumnType("numeric(20,0)");
+
+                            b1.Property<decimal>("UserId")
+                                .HasColumnType("numeric(20,0)");
+
+                            b1.HasKey("TokenPairAuthRecordId");
+
+                            b1.ToTable("TokenPairAuthRecords");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TokenPairAuthRecordId");
+                        });
+
+                    b.OwnsOne("Common.Domain.ValueObjects.RoleKey", "RoleId", b1 =>
+                        {
+                            b1.Property<Guid>("TokenPairAuthRecordId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<decimal>("GuildId")
+                                .HasColumnType("numeric(20,0)");
+
+                            b1.Property<decimal>("RoleId")
+                                .HasColumnType("numeric(20,0)");
+
+                            b1.HasKey("TokenPairAuthRecordId");
+
+                            b1.ToTable("TokenPairAuthRecords");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TokenPairAuthRecordId");
+                        });
+
+                    b.Navigation("MemberId")
+                        .IsRequired();
+
+                    b.Navigation("RoleId")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

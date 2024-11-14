@@ -9,6 +9,6 @@ namespace APIGateway.Infrastructure.Communication.MessageConsumer
         : IIntegrationMessageHandler<RoleTokenRevoked>
     {
         public async Task Handle(IntegrationMessage<RoleTokenRevoked> aIntegrationMessage, CancellationToken aCancellationToken = default)
-            => await aTokenRevocationService.OutdateByDiscordRoleListAsync(aIntegrationMessage.Content.DiscordRoleIdList, aCancellationToken);
+            => await aTokenRevocationService.OutdateByDiscordRoleListAsync(aIntegrationMessage.Content.RoleIdList, aCancellationToken);
     }
 }

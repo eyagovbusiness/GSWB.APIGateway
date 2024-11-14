@@ -1,5 +1,6 @@
 ﻿using APIGateway.Application.DTOs;
 using APIGateway.Domain.Entities;
+using Common.Domain.ValueObjects;
 using System.Collections.Immutable;
 using System.Security.Claims;
 using TGF.Common.ROP;
@@ -31,16 +32,16 @@ namespace APIGateway.Application
         /// <summary>
         /// Mark as outdated all the <see cref="TokenPairAuthRecord"/> related with any of the provided DiscordUser ID.
         /// </summary>
-        /// <param name="memberIdList">The list of members identified by the DiscordUser IDs whose tokens need to be revoked.</param>
+        /// <param name="memberIdList">The list of guild members whose tokens need to be revoked.</param>
         /// <returns>List of <see cref="string"/> with the revoked access tokens.</returns>
-        Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForMemberListAsync(IEnumerable<Guid> memberIdList, CancellationToken aCancellationToken = default);
+        Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForMemberListAsync(IEnumerable<MemberKey> memberIdList, CancellationToken aCancellationToken = default);
 
         /// <summary>
         /// Mark as outdated all the <see cref="TokenPairAuthRecord"/> related with any of the provided DiscordRole ID.
         /// </summary>
-        /// <param name="aDiscordRoleIdList">List of DiscordRoleId used to revoke the tokens.</param>
+        /// <param name="roleIdList">List of discord roles used to revoke the tokens.</param>
         /// <returns>List of <see cref="string"/> with the revoked access tokens.</returns>
-        Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForRoleListAsync(IEnumerable<ulong> aDiscordRoleIdList, CancellationToken aCancellationToken = default);
+        Task<IHttpResult<ImmutableArray<string>>> OutdateTokenPairForRoleListAsync(IEnumerable<RoleKey> roleIdList, CancellationToken aCancellationToken = default);
 
         /// <summary>
         /// Cleans the current token pair the user is logged with, so after this operation.

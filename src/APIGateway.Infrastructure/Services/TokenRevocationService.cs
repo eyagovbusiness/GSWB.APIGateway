@@ -1,4 +1,5 @@
 ﻿using APIGateway.Application;
+using Common.Domain.ValueObjects;
 using Common.Infrastructure.Security;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -40,7 +41,7 @@ namespace APIGateway.Infrastructure.Services
             return false;
         }
 
-        public async Task OutdateByDiscordUserListAsync(Guid[] memberIdList, CancellationToken aCancellationToken)
+        public async Task OutdateByDiscordUserListAsync(IEnumerable<MemberKey> memberIdList, CancellationToken aCancellationToken)
         {
             ImmutableArray<string> lListOfRevokedTokens = [];
             using (var scope = _serviceScopeFactory.CreateScope())
@@ -62,13 +63,13 @@ namespace APIGateway.Infrastructure.Services
                 UpdateRevokedTokenBuckets(aAccessTokenLisrtToBlacklist);
         }
 
-        public async Task OutdateByDiscordRoleListAsync(ulong[] aDiscordRoleIdList, CancellationToken aCancellationToken)
+        public async Task OutdateByDiscordRoleListAsync(IEnumerable<RoleKey> roleIdList, CancellationToken aCancellationToken)
         {
             ImmutableArray<string> lListOfRevokedTokens = Array.Empty<string>().ToImmutableArray();
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var lTokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
-                var lRevocationResult = await lTokenService.OutdateTokenPairForRoleListAsync(aDiscordRoleIdList, aCancellationToken);
+                var lRevocationResult = await lTokenService.OutdateTokenPairForRoleListAsync(roleIdList, aCancellationToken);
                 if (!lRevocationResult.IsSuccess)
                     throw new Exception("Error revoking tokens in DB, security may be compromised!!");
 

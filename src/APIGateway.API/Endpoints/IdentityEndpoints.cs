@@ -18,6 +18,7 @@ using TGF.CA.Presentation;
 using TGF.CA.Presentation.MinimalAPI;
 using TGF.Common.ROP.Result;
 using TGF.Common.ROP.HttpResult.RailwaySwitches;
+using Common.Domain.ValueObjects;
 
 namespace APIGateway.API.Endpoints
 {
@@ -97,7 +98,7 @@ namespace APIGateway.API.Endpoints
         /// </summary>
         private async Task<IResult> Get_TokenPair(string guildId, ITokenService aTokenService, ClaimsPrincipal aClaims, DiscordIdValidator discordIdValidator, IMembersCommunicationService membersCommunicationService, CancellationToken aCancellationToken = default)
             => await Result.ValidationResult(discordIdValidator.Validate(guildId))
-            .Bind(_ => membersCommunicationService.GetExistingMember(TokenGenerationHelpers.GetDiscordCookieUserInfo(aClaims).UserNameIdentifier, guildId, aCancellationToken))
+            .Bind(_ => membersCommunicationService.GetExistingMember(new MemberKey(guildId,TokenGenerationHelpers.GetDiscordCookieUserInfo(aClaims).UserNameIdentifier), aCancellationToken))
             .Bind(member => aTokenService.GetNewTokenPairAsync(guildId, aClaims, aCancellationToken))
             .ToIResult();
 

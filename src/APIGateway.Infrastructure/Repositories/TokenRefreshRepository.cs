@@ -8,6 +8,8 @@ using TGF.Common.ROP.HttpResult;
 using TGF.Common.ROP.Result;
 using TGF.Common.ROP.HttpResult.RailwaySwitches;
 using TGF.CA.Infrastructure.DB.Repository;
+using Common.Domain.ValueObjects;
+using TGF.CA.Infrastructure.DB.Repository.CQRS.EntityRepository;
 
 namespace APIGateway.Infrastructure.Repositories
 {
@@ -27,14 +29,14 @@ namespace APIGateway.Infrastructure.Repositories
             .Verify(tokenPairAuthRecord => tokenPairAuthRecord! != default!, InfrastructureErrors.AuthDatabase.RefreshTokenNotFound);
 #pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
 
-        public async Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordUserIdListAsync(IEnumerable<Guid> memberIdList, CancellationToken aCancellationToken = default)
+        public async Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordUserIdListAsync(IEnumerable<MemberKey> memberIdList, CancellationToken aCancellationToken = default)
          => await RevokeTokenListAsync(await _context.TokenPairAuthRecords
             .Where(tokensRecord => memberIdList.Contains(tokensRecord.MemberId) && !tokensRecord.IsOutdated)
             .ToListAsync(aCancellationToken), aCancellationToken);
 
-        public async Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordRoleIdListAsync(IEnumerable<ulong> aDiscordRoleIdList, CancellationToken aCancellationToken = default)
+        public async Task<IHttpResult<ImmutableArray<string>>> RevokeByDiscordRoleIdListAsync(IEnumerable<RoleKey> aDiscordRoleIdList, CancellationToken aCancellationToken = default)
         => await RevokeTokenListAsync(await _context.TokenPairAuthRecords
-            .Where(tokensRecord => aDiscordRoleIdList.Contains(tokensRecord.DiscordRoleId) && !tokensRecord.IsOutdated)
+            .Where(tokensRecord => aDiscordRoleIdList.Contains(tokensRecord.RoleId) && !tokensRecord.IsOutdated)
             .ToListAsync(aCancellationToken), aCancellationToken);
 
         public async Task<IHttpResult<int>> DeleteExpiredRecordsAsync(CancellationToken aCancellationToken = default)

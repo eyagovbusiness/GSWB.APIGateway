@@ -2,6 +2,7 @@
 using APIGateway.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using TGF.CA.Infrastructure.DB.Repository;
+using TGF.CA.Infrastructure.DB.Repository.CQRS.EntityRepository;
 
 namespace APIGateway.Infrastructure.Repositories
 {
